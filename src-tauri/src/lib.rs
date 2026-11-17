@@ -270,6 +270,7 @@ fn start_mirror(
     max_size: u16,
     max_fps: u8,
     bitrate: String,
+    fullscreen: bool,
 ) -> Result<String, String> {
     validate_serial(&serial)?;
     if ![0, 720, 1080, 1440].contains(&max_size) {
@@ -306,6 +307,9 @@ fn start_mirror(
     if max_size > 0 {
         args.push("--max-size".to_string());
         args.push(max_size.to_string());
+    }
+    if fullscreen {
+        args.push("--fullscreen".to_string());
     }
 
     let mut registry = state
