@@ -88,8 +88,8 @@ foreach ($tool in @("node", "npm", "rustc", "cargo", "rustup", "git")) {
         continue
     }
     try {
-        $versionOutput = & $command.Source --version 2>&1 | Select-Object -First 2
-        $lines.Add($tool + " path: " + $command.Source)
+        $versionOutput = & $command.Path --version 2>&1 | Select-Object -First 2
+        $lines.Add($tool + " path: " + $command.Path)
         foreach ($versionLine in $versionOutput) { $lines.Add("  " + [string]$versionLine) }
     }
     catch { $lines.Add($tool + " : version check failed: " + $_.Exception.Message) }
