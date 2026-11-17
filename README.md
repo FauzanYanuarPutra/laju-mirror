@@ -68,6 +68,7 @@ The development app can use adb and scrcpy from src-tauri/resources/tools/scrcpy
 npm run check
 cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
 cargo check --manifest-path src-tauri/Cargo.toml
+npm run tauri icon src-tauri/icons/icon.svg
 npm run tauri build
 ~~~
 
