@@ -49,14 +49,17 @@ Metode ini memerlukan koneksi USB yang sudah diotorisasi.
 
 Jika proses gagal, pastikan firewall dan router tidak memblokir komunikasi antarperangkat dalam jaringan lokal.
 
-## Memutus koneksi
+## Memutus koneksi dan mengembalikan mode USB
 
-Gunakan Disconnect Wi-Fi di LajuMirror atau matikan Wireless Debugging dari pengaturan Android. Pada metode TCP/IP, kamu juga dapat memutuskan koneksi melalui tombol yang tersedia pada aplikasi.
+- Untuk koneksi Wireless Debugging Android 11 ke atas, gunakan Disconnect Wi-Fi di LajuMirror, lalu matikan Wireless Debugging dari Developer options di HP.
+- Untuk metode TCP/IP klasik, selama perangkat Wi-Fi masih muncul di LajuMirror, pilih Restore TCP/IP to USB terlebih dahulu. Aplikasi menjalankan perintah ADB untuk mengembalikan daemon ke mode USB. Setelah itu, sambungkan kembali kabel bila diperlukan.
+- Disconnect Wi-Fi hanya memutuskan koneksi dari komputer. Perintah itu tidak selalu menonaktifkan layanan debugging di HP.
 
 ## Catatan keamanan
 
 - Hindari mengaktifkan ADB TCP/IP pada Wi-Fi publik.
 - Jangan membagikan pairing code atau alamat debugging ketika sesi masih aktif.
 - Matikan Wireless Debugging setelah selesai.
+- Untuk metode TCP/IP klasik, kembalikan daemon ke mode USB sebelum menutup koneksi Wi-Fi.
 - Cabut otorisasi komputer yang tidak lagi digunakan dari Developer options.
 - Jangan meneruskan port debugging Android ke internet melalui router.
