@@ -52,6 +52,17 @@ For devices enforcing Smart App Control or enterprise App Control, broad distrib
 
 Smart App Control does not provide an application-specific "allow this one anyway" confirmation for an arbitrary unsigned executable. It relies on Microsoft's reputation/intelligence checks and trusted signing. Enterprise App Control and AppLocker rules are controlled by the device administrator.
 
+## Signing support for official releases
+
+The release workflow supports Authenticode signing when the repository owner configures these GitHub Actions secrets:
+
+- `WINDOWS_SIGNING_PFX_BASE64`: the base64-encoded PFX containing the code-signing certificate and private key.
+- `WINDOWS_SIGNING_PFX_PASSWORD`: the PFX password.
+
+The certificate must be a legitimate code-signing certificate trusted by the Windows trust chain. Do not commit a PFX file or password to the repository, and do not use a self-signed development certificate as a substitute for a trusted public signing identity. Without both secrets, the workflow deliberately publishes unsigned installers.
+
+Even a signed release is not guaranteed to pass every enterprise policy. A device administrator may still need to approve the certificate publisher through the organization's App Control or AppLocker policy.
+
 ## What LajuMirror intentionally does not do
 
 - It does not disable or weaken Windows security.
@@ -61,3 +72,5 @@ Smart App Control does not provide an application-specific "allow this one anywa
 - It does not claim that clicking a LajuMirror confirmation can override Windows enforcement.
 
 This is intentional. A user confirmation inside an application is not a valid security-policy decision by Windows.
+
+For AppLocker-managed devices, an administrator can configure a support URL in the blocked-app message using Group Policy. This is an administrator-managed help path, not an app-controlled allow button. See Microsoft's [custom AppLocker blocked-app message guidance](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/display-a-custom-url-message-when-users-try-to-run-a-blocked-application).
