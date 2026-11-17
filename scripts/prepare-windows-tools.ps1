@@ -27,6 +27,17 @@ $zipPath = Join-Path $temp $asset.name
 Write-Host "Downloading $($asset.name) from the official scrcpy release..."
 Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zipPath -Headers $headers
 
+if ($asset.digest -and $asset.digest.StartsWith("sha256:")) {
+  $expectedHash = $asset.digest.Substring(7).ToLowerInvariant()
+  $actualHash = (Get-FileHash -Path $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
+  if ($actualHash -ne $expectedHash) {
+    throw "scrcpy archive SHA-256 verification failed."
+  }
+  Write-Host "Verified scrcpy archive SHA-256."
+} else {
+  Write-Warning "GitHub did not provide an asset SHA-256 digest; download integrity could not be independently checked."
+}
+
 $extractPath = Join-Path $temp "extracted"
 Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
 $scrcpyExe = Get-ChildItem -Path $extractPath -Filter "scrcpy.exe" -Recurse -File | Select-Object -First 1
