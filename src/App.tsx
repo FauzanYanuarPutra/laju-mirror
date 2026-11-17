@@ -62,6 +62,7 @@ const copy = {
     port: "Port",
     enableConnect: "Aktifkan dan hubungkan",
     disconnect: "Putuskan Wi-Fi",
+    restoreUsb: "Kembalikan ke USB",
     help: "Panduan",
     helpLink: "Buka dokumentasi",
     secure: "Koneksi lokal",
@@ -114,6 +115,7 @@ const copy = {
     port: "Port",
     enableConnect: "Enable and connect",
     disconnect: "Disconnect Wi-Fi",
+    restoreUsb: "Return to USB mode",
     help: "Help",
     helpLink: "Open documentation",
     secure: "Local connection",
@@ -279,6 +281,15 @@ function App() {
     await runAction(() => invoke<CommandResult>("disconnect_device", { serial: wifiDevice.serial }));
   };
 
+  const restoreUsbMode = async () => {
+    const wifiDevice = devices.find((device) => device.transport === "wifi" && device.state === "device");
+    if (!wifiDevice) {
+      showNotice(lang === "id" ? "Sambungkan perangkat TCP/IP melalui Wi-Fi terlebih dahulu." : "Connect a TCP/IP device over Wi-Fi first.", true);
+      return;
+    }
+    await runAction(() => invoke<CommandResult>("restore_usb_mode", { serial: wifiDevice.serial }));
+  };
+
   const toolsReady = Boolean(tools?.adbAvailable && tools?.scrcpyAvailable);
   const canMirror = Boolean(selectedDevice?.state === "device" && toolsReady);
   const connectedCount = devices.filter((device) => device.state === "device").length;
@@ -399,7 +410,10 @@ function App() {
                   <button className="outline-action" onClick={() => void enableTcpAndConnect()} disabled={busy}>{t.enableConnect}</button>
                 </div>
               </div>
-              <button className="disconnect-link" onClick={() => void disconnectWifi()} disabled={busy}><WifiOff size={14} /> {t.disconnect}</button>
+              <div className="wifi-footer-actions">
+                <button className="disconnect-link" onClick={() => void disconnectWifi()} disabled={busy}><WifiOff size={14} /> {t.disconnect}</button>
+                <button className="disconnect-link" onClick={() => void restoreUsbMode()} disabled={busy}><Cable size={14} /> {t.restoreUsb}</button>
+              </div>
             </div>
           )}
         </div>
