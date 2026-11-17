@@ -34,7 +34,8 @@
     ],
     "resources": {
       "resources/tools/scrcpy/*": "tools/scrcpy/",
-      "../THIRD-PARTY-NOTICES.md": "THIRD-PARTY-NOTICES.md"
+      "../THIRD-PARTY-NOTICES.md": "THIRD-PARTY-NOTICES.md",
+      "../LICENSE": "LICENSE"
     },
     "category": "Utility",
     "shortDescription": "Android screen mirroring for Windows",
