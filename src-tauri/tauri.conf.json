@@ -40,6 +40,21 @@
     "category": "Utility",
     "shortDescription": "Android screen mirroring for Windows",
     "longDescription": "Mirror and control Android phones over USB or Wi-Fi while keeping audio on the phone.",
+    "windows": {
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.digicert.com",
+      "signCommand": {
+        "cmd": "powershell",
+        "args": [
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "sign-windows-file.ps1",
+          "%1"
+        ]
+      }
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
