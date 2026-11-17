@@ -58,7 +58,7 @@ Requirements:
 ~~~powershell
 git clone https://github.com/FauzanYanuarPutra/laju-mirror.git
 cd laju-mirror
-npm ci
+npm install
 npm run tauri dev
 ~~~
 
