@@ -29,7 +29,14 @@ function Get-EventDataMap {
     try {
         [xml]$eventXml = $EventRecord.ToXml()
         foreach ($node in $eventXml.Event.EventData.Data) {
-            if ($node.Name) { $map[[string]$node.Name] = [string]$node.InnerText }
+            $fieldName = $null
+            if ($node.Attributes -and $node.Attributes["Name"]) {
+                $fieldName = [string]$node.Attributes["Name"].Value
+            }
+            if ([string]::IsNullOrWhiteSpace($fieldName)) {
+                $fieldName = "Data" + ($map.Count + 1)
+            }
+            $map[$fieldName] = [string]$node.InnerText
         }
     }
     catch { $map["ParseError"] = $_.Exception.Message }
