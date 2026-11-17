@@ -1,6 +1,12 @@
 # LajuMirror
 
+[![Windows CI](https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/FauzanYanuarPutra/laju-mirror?display_name=tag)](https://github.com/FauzanYanuarPutra/laju-mirror/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 **Mirror and control your Android phone on Windows. Keep sound on your phone.**
+
+Project website: https://fauzanyanuarputra.github.io/laju-mirror/
 
 LajuMirror is a lightweight Windows desktop companion for mirroring and controlling Android devices over USB or Wi-Fi. It wraps the proven [scrcpy](https://github.com/Genymobile/scrcpy) engine in a friendly interface, so everyday users do not need to remember terminal commands.
 
@@ -81,7 +87,10 @@ npm run tauri build
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Privacy and security](docs/PRIVACY.md)
 - [FAQ](docs/FAQ.md)
+- [Release checklist for maintainers](docs/RELEASE-CHECKLIST.md)
+- [Changelog](CHANGELOG.md)
 - [Contributing](CONTRIBUTING.md)
+- [Code of conduct](CODE_OF_CONDUCT.md)
 - [Security policy](SECURITY.md)
 
 ## Privacy
