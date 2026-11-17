@@ -3,7 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import {
   Activity, Check, ChevronDown, CircleHelp, Cable, CircleDot, Languages,
   LoaderCircle, Monitor, MonitorPlay, RefreshCw, Settings2, ShieldCheck,
-  Smartphone, Sparkles, Volume2, Wifi, WifiOff, X, Zap,
+  Smartphone, Volume2, Wifi, WifiOff, X, Zap,
 } from "lucide-react";
 
 type Device = {
@@ -226,21 +226,25 @@ function App() {
     });
   };
 
-  const pairAndConnect = async () => {
-    if (!pairAddress.trim() || !pairCode.trim() || !connectAddress.trim()) {
-      showNotice(lang === "id" ? "Isi alamat pairing, kode, dan alamat koneksi." : "Enter the pairing address, code and connection address.", true);
+  const pairDevice = async () => {
+    if (!pairAddress.trim() || !pairCode.trim()) {
+      showNotice(lang === "id" ? "Isi alamat pairing dan kode yang tampil di HP." : "Enter the pairing address and code shown on your phone.", true);
       return;
     }
-    await runAction(async () => {
-      const paired = await invoke<CommandResult>("pair_device", {
-        pairingAddress: pairAddress.trim(),
-        pairingCode: pairCode.trim(),
-      });
-      if (!paired.success) return paired;
-      return await invoke<CommandResult>("connect_wifi_device", {
-        address: connectAddress.trim(),
-      });
-    });
+    await runAction(() => invoke<CommandResult>("pair_device", {
+      pairingAddress: pairAddress.trim(),
+      pairingCode: pairCode.trim(),
+    }));
+  };
+
+  const connectWifi = async () => {
+    if (!connectAddress.trim()) {
+      showNotice(lang === "id" ? "Isi alamat koneksi dari halaman Wireless Debugging." : "Enter the connection address from the Wireless Debugging screen.", true);
+      return;
+    }
+    await runAction(() => invoke<CommandResult>("connect_wifi_device", {
+      address: connectAddress.trim(),
+    }));
   };
 
   const enableTcpAndConnect = async () => {
@@ -375,10 +379,10 @@ function App() {
                 <input value={pairAddress} onChange={(e) => setPairAddress(e.target.value)} placeholder={t.pairAddress} autoComplete="off" />
                 <div className="input-row">
                   <input value={pairCode} onChange={(e) => setPairCode(e.target.value)} placeholder={t.pairCode} inputMode="numeric" autoComplete="one-time-code" />
-                  <button className="outline-action" onClick={() => void pairAndConnect()} disabled={busy}>{busy ? <LoaderCircle className="spin" size={15} /> : null}{t.pair}</button>
+                  <button className="outline-action" onClick={() => void pairDevice()} disabled={busy}>{busy ? <LoaderCircle className="spin" size={15} /> : null}{t.pair}</button>
                 </div>
                 <input value={connectAddress} onChange={(e) => setConnectAddress(e.target.value)} placeholder={t.connectAddress} autoComplete="off" />
-                <button className="wide-outline" onClick={() => void pairAndConnect()} disabled={busy}>{t.connect}</button>
+                <button className="wide-outline" onClick={() => void connectWifi()} disabled={busy}>{t.connect}</button>
               </div>
               <div className="divider-label"><span>{lang === "id" ? "ATAU METODE USB KE WI-FI" : "OR USB TO WI-FI METHOD"}</span></div>
               <div className="form-block compact-form">
