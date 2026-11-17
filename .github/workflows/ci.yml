@@ -46,6 +46,13 @@ jobs:
       - name: Build Windows installers
         run: npm run tauri build -- --bundles msi,nsis
 
+      - name: Sign Windows installers when a trusted certificate is configured
+        shell: pwsh
+        env:
+          WINDOWS_SIGNING_PFX_BASE64: ${{ secrets.WINDOWS_SIGNING_PFX_BASE64 }}
+          WINDOWS_SIGNING_PFX_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PFX_PASSWORD }}
+        run: ./scripts/sign-windows.ps1
+
       - name: Check Rust formatting
         run: cargo fmt --manifest-path src-tauri/Cargo.toml
 
