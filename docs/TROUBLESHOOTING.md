@@ -66,6 +66,26 @@ npm install
 
 LajuMirror hanya memberi persetujuan pada skrip instalasi esbuild yang dipakai toolchain proyek; ini bukan pengecualian Windows Application Control. Bila kebijakan Windows tetap memblokir binary lain, minta administrator perangkat meninjau log Code Integrity/App Control dan mengizinkan komponen build yang telah diverifikasi. Pada perangkat kantor atau kampus, jangan mencoba melewati kebijakan organisasi.
 
+## Vite menampilkan EBUSY saat Cargo gagal
+
+Jika Vite menampilkan pesan seperti:
+
+~~~text
+Error: EBUSY: resource busy or locked, watch '...src-tauri/target/...'
+~~~
+
+Vite sebelumnya ikut memantau file sementara yang dibuat Cargo. Konfigurasi terbaru mengecualikan folder `src-tauri/target` dan folder `target` dari watcher.
+
+Ambil perbaikannya:
+
+~~~powershell
+git pull origin main
+npm install
+npm run dev:windows
+~~~
+
+Pengecualian watcher hanya menghilangkan pemantauan file build Rust oleh Vite. Ini tidak memperbaiki kebijakan Application Control yang memblokir executable build script Cargo. Laporan Windows tetap diperlukan untuk mengetahui kebijakan yang menolak proses tersebut.
+
 ## ADB atau scrcpy tidak ditemukan
 
 Installer yang dipublikasikan melalui workflow resmi disiapkan untuk membawa scrcpy dan ADB. Untuk development lokal, tempatkan file resmi scrcpy Windows di src-tauri/resources/tools/scrcpy atau tambahkan scrcpy dan ADB ke PATH.
