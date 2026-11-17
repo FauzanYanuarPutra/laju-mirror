@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071611">
+  <title>LajuMirror — Android Screen Mirroring untuk Windows | USB & Wi-Fi</title>
+  <meta name="description" content="Tampilkan dan kontrol layar Android di laptop Windows lewat USB atau Wi-Fi. Dengan LajuMirror, suara tetap di HP, tanpa akun dan tanpa cloud relay.">
+  <meta name="keywords" content="Android screen mirroring, mirror HP ke laptop, scrcpy Windows, Xiaomi screen mirroring, USB mirroring, WiFi mirroring, kontrol Android dari PC, LajuMirror">
+  <meta name="author" content="LajuMirror contributors">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://fauzanyanuarputra.github.io/laju-mirror/">
+  <link rel="alternate" hreflang="id" href="https://fauzanyanuarputra.github.io/laju-mirror/">
+  <link rel="alternate" hreflang="en" href="https://fauzanyanuarputra.github.io/laju-mirror/#english">
+  <link rel="alternate" hreflang="x-default" href="https://fauzanyanuarputra.github.io/laju-mirror/">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LajuMirror">
+  <meta property="og:title" content="LajuMirror — A wider screen. Sound stays on your phone.">
+  <meta property="og:description" content="Mirror and control Android from Windows over USB or Wi-Fi. Audio stays on your phone by default.">
+  <meta property="og:url" content="https://fauzanyanuarputra.github.io/laju-mirror/">
+  <meta property="og:image" content="https://fauzanyanuarputra.github.io/laju-mirror/assets/social-preview.svg">
+  <meta property="og:image:alt" content="LajuMirror Android screen mirroring for Windows">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="LajuMirror — Android mirroring for Windows">
+  <meta name="twitter:description" content="Mirror Android over USB or Wi-Fi. Keep sound on your phone.">
+  <meta name="twitter:image" content="https://fauzanyanuarputra.github.io/laju-mirror/assets/social-preview.svg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "LajuMirror",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Windows 10, Windows 11",
+    "description": "A local Windows desktop app for mirroring and controlling Android devices over USB or Wi-Fi while keeping audio on the phone by default.",
+    "url": "https://fauzanyanuarputra.github.io/laju-mirror/",
+    "downloadUrl": "https://github.com/FauzanYanuarPutra/laju-mirror/releases",
+    "softwareVersion": "0.1.0",
+    "license": "https://github.com/FauzanYanuarPutra/laju-mirror/blob/main/LICENSE",
+    "isAccessibleForFree": true,
+    "codeRepository": "https://github.com/FauzanYanuarPutra/laju-mirror"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type":"Question","name":"Apakah suara tetap keluar dari HP?","acceptedAnswer":{"@type":"Answer","text":"Ya. LajuMirror menonaktifkan audio forwarding secara default sehingga suara tetap mengikuti output audio Android."}},
+      {"@type":"Question","name":"Apakah LajuMirror bisa menggunakan Wi-Fi?","acceptedAnswer":{"@type":"Answer","text":"Ya. LajuMirror mendukung Android Wireless Debugging pairing dan ADB TCP/IP melalui koneksi USB awal."}},
+      {"@type":"Question","name":"Apakah harus memasang aplikasi di Android?","acceptedAnswer":{"@type":"Answer","text":"Tidak. LajuMirror adalah aplikasi Windows dan menggunakan ADB serta scrcpy untuk terhubung ke Android."}}
+    ]
+  }
+  </script>
+  <style>
+    :root{color-scheme:dark;--bg:#071611;--panel:#0e2419;--line:rgba(175,218,188,.13);--muted:#9cb7a6;--text:#eff8f1;--green:#79e0a5;--bright:#2ba86b}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 82% 6%,rgba(23,130,84,.22),transparent 33%),var(--bg);color:var(--text);font-family:"DM Sans",Arial,sans-serif}a{color:inherit;text-decoration:none}button{font:inherit}
+    .wrap{width:min(1120px,calc(100% - 44px));margin:auto}.top{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:10px;font:800 18px Manrope,sans-serif;letter-spacing:-.8px}.brand-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#123c28;border:1px solid rgba(121,224,165,.3);color:var(--green)}.brand b{color:var(--green)}.nav{display:flex;align-items:center;gap:26px;color:#adc6b6;font-size:12px}.nav a:hover{color:var(--green)}.nav-actions{display:flex;align-items:center;gap:10px}.lang{border:1px solid var(--line);border-radius:8px;background:transparent;color:#cfe1d4;padding:8px 10px;font-size:11px;cursor:pointer}.button{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 16px;border-radius:9px;background:linear-gradient(110deg,#2eae70,#188451);color:white;font-size:12px;font-weight:700;box-shadow:0 7px 24px rgba(14,117,68,.2)}.button.secondary{background:rgba(255,255,255,.035);border:1px solid var(--line);box-shadow:none;color:#d9eade}.button:hover{filter:brightness(1.1)}.hero{position:relative;display:grid;grid-template-columns:1.12fr .88fr;gap:30px;align-items:center;padding:86px 0 75px}.eyebrow{display:flex;align-items:center;gap:9px;color:#85c99d;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase}.dot{width:7px;height:7px;border-radius:50%;background:#6bdd9b;box-shadow:0 0 0 4px rgba(107,221,155,.1)}h1{font:800 clamp(42px,5.4vw,68px)/1.08 Manrope,sans-serif;letter-spacing:-3.5px;margin:20px 0 17px}.accent{color:var(--green)}.lead{max-width:520px;color:#a9c2b2;font-size:15px;line-height:1.8;margin:0 0 25px}.hero-cta{display:flex;flex-wrap:wrap;gap:10px}.hero-note{margin-top:16px;color:#769782;font-size:10px}.visual{height:350px;display:grid;place-items:center;position:relative}.rings{position:absolute;width:310px;height:210px;border:1px solid rgba(116,213,154,.19);border-radius:50%;transform:rotate(-27deg)}.rings:after{content:"";position:absolute;inset:25px -25px;border:1px solid rgba(116,213,154,.12);border-radius:50%}.phone{position:relative;width:156px;height:284px;padding:9px;border:2px solid #458766;border-radius:27px;background:#0d281c;box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 70px rgba(54,183,111,.14);transform:rotate(7deg)}.screen{height:100%;border-radius:19px;background:linear-gradient(145deg,#1d6542,#0d2b1e);padding:42px 15px 15px;overflow:hidden}.notch{position:absolute;top:12px;left:61px;width:30px;height:5px;border-radius:5px;background:#06140d}.screen-line{height:6px;width:62px;border-radius:9px;background:#a8e9bb;margin-bottom:9px;opacity:.8}.screen-line.long{width:102px;height:4px;opacity:.25}.screen-card{height:74px;margin-top:27px;border-radius:11px;background:linear-gradient(140deg,#459e68,#1b6841);border:1px solid rgba(193,255,211,.2)}.bars{display:flex;align-items:end;gap:7px;height:52px;margin-top:20px}.bars i{flex:1;border-radius:4px 4px 1px 1px;background:#7ed89d}.bars i:nth-child(1){height:45%}.bars i:nth-child(2){height:78%}.bars i:nth-child(3){height:58%}.bars i:nth-child(4){height:100%}.float{position:absolute;padding:10px 13px;border:1px solid rgba(130,220,160,.23);border-radius:10px;background:#0c291c;box-shadow:0 14px 30px rgba(0,0,0,.2);font-size:10px;color:#c8efd3}.float.topfloat{right:12px;top:59px;color:var(--green)}.float.bottomfloat{left:4px;bottom:61px;display:flex;align-items:center;gap:8px}.section{padding:55px 0;border-top:1px solid var(--line)}.section-head{max-width:650px;margin:0 auto 29px;text-align:center}.kicker{color:#78bd91;font-size:9px;font-weight:700;letter-spacing:2px}.section h2{font:750 clamp(25px,3.1vw,37px)/1.2 Manrope,sans-serif;letter-spacing:-1.3px;margin:12px 0}.section-head p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}.features{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.card{padding:21px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(140deg,rgba(17,47,31,.9),rgba(10,30,21,.84))}.icon{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:rgba(105,204,143,.12);color:#91e3ac;font-size:18px}.card h3{margin:15px 0 8px;font:700 14px Manrope,sans-serif}.card p{margin:0;color:#9db6a6;font-size:11px;line-height:1.75}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.step{padding:19px;border:1px solid var(--line);border-radius:12px}.num{color:#7cdb9f;font:800 25px Manrope}.step h3{margin:8px 0;font-size:13px}.step p{margin:0;color:#9db6a6;font-size:11px;line-height:1.7}.audio{display:grid;grid-template-columns:.8fr 1.2fr;gap:32px;align-items:center;padding:28px;border:1px solid rgba(113,218,153,.2);border-radius:16px;background:linear-gradient(120deg,rgba(36,118,72,.18),rgba(11,33,23,.9))}.audio h2{font-size:28px;margin:10px 0}.audio p{color:#a8c0b0;font-size:12px;line-height:1.8}.audio-state{display:flex;align-items:center;gap:13px;padding:17px;border:1px solid rgba(117,220,157,.18);border-radius:12px;background:rgba(4,23,14,.35)}.audio-state strong{font-size:12px}.audio-state small{display:block;margin-top:5px;color:#8ba994;font-size:10px}.toggle{width:38px;height:21px;border-radius:30px;background:#20764a;padding:3px;margin-left:auto}.toggle:after{content:"";display:block;width:15px;height:15px;border-radius:50%;background:#a6edbd;margin-left:auto}.faq{max-width:760px;margin:auto;display:grid;gap:9px}.faq details{padding:16px 18px;border:1px solid var(--line);border-radius:10px;background:rgba(15,39,26,.65)}.faq summary{cursor:pointer;font-weight:600;font-size:12px}.faq p{margin:11px 0 0;color:#9db6a6;font-size:11px;line-height:1.75}.cta{margin:45px auto 60px;padding:36px;text-align:center;border:1px solid rgba(113,218,153,.2);border-radius:16px;background:radial-gradient(ellipse at 50% 0%,rgba(53,157,96,.2),transparent 65%),#0d2519}.cta h2{font:750 30px Manrope;margin:0 0 10px;letter-spacing:-1px}.cta p{color:#a7bfae;font-size:12px;margin:0 0 19px}.footer{padding:24px 0 30px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:20px;color:#789381;font-size:10px}.footer-links{display:flex;gap:17px}.footer a:hover{color:#a6e9bc}.hidden{display:none!important}
+    @media(max-width:760px){.nav{display:none}.hero{grid-template-columns:1fr;padding:60px 0 35px}.visual{height:280px;grid-row:1}.hero-copy{text-align:center}.eyebrow,.hero-cta{justify-content:center}.lead{margin-left:auto;margin-right:auto}.features,.steps{grid-template-columns:1fr 1fr}.audio{grid-template-columns:1fr;gap:15px}.section{padding:42px 0}.footer{flex-direction:column;align-items:flex-start}}
+    @media(max-width:480px){.wrap{width:calc(100% - 32px)}.top{height:67px}.brand{font-size:15px}.hero{padding-top:35px}h1{font-size:43px;letter-spacing:-2px}.visual{height:245px}.phone{transform:scale(.83) rotate(7deg)}.rings{transform:scale(.8) rotate(-27deg)}.float.topfloat{right:0}.features,.steps{grid-template-columns:1fr}.audio{padding:20px}.cta{padding:26px 18px}.cta h2{font-size:25px}.footer-links{flex-wrap:wrap}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="wrap top">
+    <a class="brand" href="./" aria-label="LajuMirror home"><span class="brand-mark">▣</span><span>Laju<b>Mirror</b></span></a>
+    <nav class="nav" aria-label="Main navigation"><a href="#features" data-id="Fitur" data-en="Features">Fitur</a><a href="#how" data-id="Cara pakai" data-en="How it works">Cara pakai</a><a href="#faq" data-id="FAQ" data-en="FAQ">FAQ</a><a href="https://github.com/FauzanYanuarPutra/laju-mirror/tree/main/docs" target="_blank" rel="noopener">Docs ↗</a></nav>
+    <div class="nav-actions"><button class="lang" id="languageToggle" type="button" aria-label="Switch language">ID / EN</button><a class="button" href="https://github.com/FauzanYanuarPutra/laju-mirror/releases" target="_blank" rel="noopener" data-id="Unduh aplikasi ↗" data-en="Download app ↗">Unduh aplikasi ↗</a></div>
+  </header>
+
+  <main>
+    <section class="wrap hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="dot"></span><span data-id="ANDROID SCREEN COMPANION" data-en="ANDROID SCREEN COMPANION">ANDROID SCREEN COMPANION</span></div>
+        <h1><span data-id="Layar lebih luas." data-en="A wider screen.">Layar lebih luas.</span><br><span class="accent" data-id="Suara tetap di HP." data-en="Sound stays on your phone.">Suara tetap di HP.</span></h1>
+        <p class="lead" data-id="Tampilkan dan kendalikan layar Android di laptop Windows melalui USB atau Wi-Fi. Tanpa aplikasi pendamping di HP, tanpa akun, dan audio tetap di perangkat." data-en="View and control your Android screen on a Windows laptop over USB or Wi-Fi. No companion app on your phone, no account, and audio stays on your device.">Tampilkan dan kendalikan layar Android di laptop Windows melalui USB atau Wi-Fi. Tanpa aplikasi pendamping di HP, tanpa akun, dan audio tetap di perangkat.</p>
+        <div class="hero-cta"><a class="button" href="https://github.com/FauzanYanuarPutra/laju-mirror/releases" target="_blank" rel="noopener" data-id="Lihat download ↗" data-en="Get LajuMirror ↗">Lihat download ↗</a><a class="button secondary" href="https://github.com/FauzanYanuarPutra/laju-mirror" target="_blank" rel="noopener" data-id="Lihat source code" data-en="View source code">Lihat source code</a></div>
+        <div class="hero-note" data-id="Untuk Windows 10/11 · Android dengan ADB · Gratis dan open source" data-en="For Windows 10/11 · Android with ADB · Free and open source">Untuk Windows 10/11 · Android dengan ADB · Gratis dan open source</div>
+      </div>
+      <div class="visual" aria-label="Illustration of a phone mirrored on a desktop">
+        <div class="rings"></div><div class="phone"><div class="notch"></div><div class="screen"><div class="screen-line"></div><div class="screen-line long"></div><div class="screen-card"></div><div class="bars"><i></i><i></i><i></i><i></i></div></div></div>
+        <div class="float topfloat">↗ 60 FPS</div><div class="float bottomfloat">◖ <span>PHONE AUDIO</span> ✓</div>
+      </div>
+    </section>
+
+    <section class="section" id="features">
+      <div class="wrap">
+        <div class="section-head"><div class="kicker" data-id="DIBUAT UNTUK PENGGUNA ANDROID" data-en="MADE FOR ANDROID USERS">DIBUAT UNTUK PENGGUNA ANDROID</div><h2 data-id="Semua yang dibutuhkan. Tanpa dibuat rumit." data-en="Everything you need. Nothing needlessly complicated.">Semua yang dibutuhkan. Tanpa dibuat rumit.</h2><p data-id="Antarmuka desktop yang mudah dipahami, dengan mesin mirroring scrcpy yang sudah matang." data-en="An approachable desktop interface, powered by the proven scrcpy mirroring engine.">Antarmuka desktop yang mudah dipahami, dengan mesin mirroring scrcpy yang sudah matang.</p></div>
+        <div class="features">
+          <article class="card"><div class="icon">⌁</div><h3 data-id="USB dan Wi-Fi" data-en="USB and Wi-Fi">USB dan Wi-Fi</h3><p data-id="Mulai dengan kabel USB, lalu gunakan Wireless Debugging atau ADB TCP/IP di jaringan tepercaya." data-en="Start with USB, then use Wireless Debugging or ADB TCP/IP on a trusted network.">Mulai dengan kabel USB, lalu gunakan Wireless Debugging atau ADB TCP/IP di jaringan tepercaya.</p></article>
+          <article class="card"><div class="icon">◖</div><h3 data-id="Suara tetap di HP" data-en="Audio stays on your phone">Suara tetap di HP</h3><p data-id="Audio forwarding dinonaktifkan secara default. Suara mengikuti pengaturan output audio Android." data-en="Audio forwarding is disabled by default. Sound follows your Android audio output settings.">Audio forwarding dinonaktifkan secara default. Suara mengikuti pengaturan output audio Android.</p></article>
+          <article class="card"><div class="icon">⌖</div><h3 data-id="Kontrol desktop" data-en="Desktop control">Kontrol desktop</h3><p data-id="Gunakan mouse dan keyboard laptop untuk berinteraksi dengan perangkat Android." data-en="Use your laptop mouse and keyboard to interact with your Android device.">Gunakan mouse dan keyboard laptop untuk berinteraksi dengan perangkat Android.</p></article>
+          <article class="card"><div class="icon">▤</div><h3 data-id="Atur kualitas" data-en="Tune quality">Atur kualitas</h3><p data-id="Pilih batas resolusi, frame rate, dan bitrate sesuai kemampuan perangkat." data-en="Choose resolution limits, frame rate and bitrate to suit your devices.">Pilih batas resolusi, frame rate, dan bitrate sesuai kemampuan perangkat.</p></article>
+          <article class="card"><div class="icon">⌘</div><h3 data-id="Tanpa aplikasi Android" data-en="No Android companion app">Tanpa aplikasi Android</h3><p data-id="Tidak perlu memasang LajuMirror di HP. Koneksi menggunakan ADB dan scrcpy." data-en="No LajuMirror app to install on your phone. Connection uses ADB and scrcpy.">Tidak perlu memasang LajuMirror di HP. Koneksi menggunakan ADB dan scrcpy.</p></article>
+          <article class="card"><div class="icon">◇</div><h3 data-id="Lokal dan open source" data-en="Local and open source">Lokal dan open source</h3><p data-id="Tidak membutuhkan akun LajuMirror atau cloud relay untuk melakukan mirroring." data-en="No LajuMirror account or cloud relay is needed to mirror your screen.">Tidak membutuhkan akun LajuMirror atau cloud relay untuk melakukan mirroring.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how">
+      <div class="wrap">
+        <div class="section-head"><div class="kicker" data-id="MULAI DALAM BEBERAPA LANGKAH" data-en="GET STARTED IN A FEW STEPS">MULAI DALAM BEBERAPA LANGKAH</div><h2 data-id="Hubungkan. Izinkan. Mulai." data-en="Connect. Authorize. Mirror.">Hubungkan. Izinkan. Mulai.</h2><p data-id="Koneksi pertama paling mudah dilakukan melalui USB." data-en="Your first connection is easiest over USB.">Koneksi pertama paling mudah dilakukan melalui USB.</p></div>
+        <div class="steps">
+          <article class="step"><div class="num">01</div><h3 data-id="Aktifkan USB debugging" data-en="Enable USB debugging">Aktifkan USB debugging</h3><p data-id="Buka Opsi pengembang Android dan aktifkan USB debugging. Nama menu dapat berbeda menurut merek." data-en="Open Android Developer options and enable USB debugging. Menu names vary by manufacturer.">Buka Opsi pengembang Android dan aktifkan USB debugging. Nama menu dapat berbeda menurut merek.</p></article>
+          <article class="step"><div class="num">02</div><h3 data-id="Sambungkan dan izinkan" data-en="Connect and authorize">Sambungkan dan izinkan</h3><p data-id="Gunakan kabel data, buka kunci HP, lalu setujui permintaan USB debugging dari laptop." data-en="Use a data cable, unlock your phone and approve the USB debugging prompt from your laptop.">Gunakan kabel data, buka kunci HP, lalu setujui permintaan USB debugging dari laptop.</p></article>
+          <article class="step"><div class="num">03</div><h3 data-id="Mulai mirroring" data-en="Start mirroring">Mulai mirroring</h3><p data-id="Pilih HP, tentukan kualitas tampilan, kemudian tekan tombol mulai di LajuMirror." data-en="Select your phone, choose display quality, then press Start in LajuMirror.">Pilih HP, tentukan kualitas tampilan, kemudian tekan tombol mulai di LajuMirror.</p></article>
+        </div>
+        <p style="text-align:center;margin:22px 0 0"><a href="https://github.com/FauzanYanuarPutra/laju-mirror/tree/main/docs" style="color:#8cdeaa;font-size:12px" target="_blank" rel="noopener" data-id="Baca panduan USB dan Wi-Fi lengkap →" data-en="Read the full USB and Wi-Fi guides →">Baca panduan USB dan Wi-Fi lengkap →</a></p>
+      </div>
+    </section>
+
+    <section class="wrap section" id="audio">
+      <div class="audio">
+        <div><div class="kicker" data-id="PENGATURAN DEFAULT" data-en="DEFAULT BEHAVIOR">PENGATURAN DEFAULT</div><h2 data-id="Layar di laptop. Audio di HP." data-en="Screen on your laptop. Audio on your phone.">Layar di laptop. Audio di HP.</h2><p data-id="LajuMirror memulai scrcpy dengan audio forwarding dinonaktifkan. Audio tetap mengikuti pengaturan output Android, termasuk speaker, earphone, atau Bluetooth." data-en="LajuMirror starts scrcpy with audio forwarding disabled. Audio follows Android's output setting, including the phone speaker, headphones or Bluetooth.">LajuMirror memulai scrcpy dengan audio forwarding dinonaktifkan. Audio tetap mengikuti pengaturan output Android, termasuk speaker, earphone, atau Bluetooth.</p></div>
+        <div class="audio-state"><span style="font-size:24px;color:#8de3aa">◖</span><div><strong data-id="Audio forwarding nonaktif" data-en="Audio forwarding disabled">Audio forwarding nonaktif</strong><small data-id="Suara tetap di perangkat Android" data-en="Sound stays on the Android device">Suara tetap di perangkat Android</small></div><span class="toggle"></span></div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="wrap">
+        <div class="section-head"><div class="kicker">FAQ</div><h2 data-id="Pertanyaan yang sering ditanyakan" data-en="Frequently asked questions">Pertanyaan yang sering ditanyakan</h2></div>
+        <div class="faq">
+          <details><summary data-id="Apakah LajuMirror hanya untuk Xiaomi?" data-en="Does LajuMirror only work with Xiaomi?">Apakah LajuMirror hanya untuk Xiaomi?</summary><p data-id="Tidak. LajuMirror ditujukan untuk perangkat Android yang mendukung ADB. Nama menu dan ketersediaan fitur bergantung pada merek dan versi Android." data-en="No. LajuMirror targets Android devices that support ADB. Menu names and feature availability depend on the manufacturer and Android version.">Tidak. LajuMirror ditujukan untuk perangkat Android yang mendukung ADB. Nama menu dan ketersediaan fitur bergantung pada merek dan versi Android.</p></details>
+          <details><summary data-id="Apakah suara benar-benar tetap keluar dari HP?" data-en="Does audio really stay on the phone?">Apakah suara benar-benar tetap keluar dari HP?</summary><p data-id="Audio forwarding dinonaktifkan secara default. Output audio tetap mengikuti pengaturan Android, jadi suara bisa tetap melalui speaker HP atau perangkat Bluetooth yang sedang dipilih." data-en="Audio forwarding is disabled by default. Audio output follows Android settings, so sound stays on the phone speaker or the Bluetooth device currently selected.">Audio forwarding dinonaktifkan secara default. Output audio tetap mengikuti pengaturan Android, jadi suara bisa tetap melalui speaker HP atau perangkat Bluetooth yang sedang dipilih.</p></details>
+          <details><summary data-id="Bisa menggunakan Wi-Fi tanpa kabel?" data-en="Can I use Wi-Fi without a cable?">Bisa menggunakan Wi-Fi tanpa kabel?</summary><p data-id="Bisa. Gunakan Wireless Debugging Android 11 ke atas. ADB TCP/IP juga tersedia dengan koneksi USB awal." data-en="Yes. Use Android Wireless Debugging on Android 11 or later. ADB TCP/IP is also available after an initial USB connection.">Bisa. Gunakan Wireless Debugging Android 11 ke atas. ADB TCP/IP juga tersedia dengan koneksi USB awal.</p></details>
+          <details><summary data-id="Apakah harus menginstal aplikasi di HP?" data-en="Do I need to install an app on Android?">Apakah harus menginstal aplikasi di HP?</summary><p data-id="Tidak. Aplikasi desktop Windows menggunakan ADB dan scrcpy. Kamu hanya perlu mengaktifkan debugging dan mengotorisasi laptop." data-en="No. The Windows desktop app uses ADB and scrcpy. You only need to enable debugging and authorize your laptop.">Tidak. Aplikasi desktop Windows menggunakan ADB dan scrcpy. Kamu hanya perlu mengaktifkan debugging dan mengotorisasi laptop.</p></details>
+          <details><summary data-id="Apakah aman memakai Wi-Fi publik?" data-en="Is public Wi-Fi safe for wireless debugging?">Apakah aman memakai Wi-Fi publik?</summary><p data-id="Tidak disarankan. Gunakan jaringan lokal yang dipercaya, jangan meneruskan port debugging ke internet, dan matikan Wireless Debugging setelah selesai." data-en="Not recommended. Use a trusted local network, never expose debugging ports to the internet, and turn Wireless Debugging off when finished.">Tidak disarankan. Gunakan jaringan lokal yang dipercaya, jangan meneruskan port debugging ke internet, dan matikan Wireless Debugging setelah selesai.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap cta"><h2 data-id="Siap memakai layar yang lebih luas?" data-en="Ready for a wider screen?">Siap memakai layar yang lebih luas?</h2><p data-id="Cek rilis, ikuti pengembangan, atau bantu membuat LajuMirror lebih baik." data-en="Explore releases, follow development, or help make LajuMirror better.">Cek rilis, ikuti pengembangan, atau bantu membuat LajuMirror lebih baik.</p><div class="hero-cta" style="justify-content:center"><a class="button" href="https://github.com/FauzanYanuarPutra/laju-mirror/releases" target="_blank" rel="noopener" data-id="Buka halaman rilis ↗" data-en="Open releases ↗">Buka halaman rilis ↗</a><a class="button secondary" href="https://github.com/FauzanYanuarPutra/laju-mirror/issues" target="_blank" rel="noopener" data-id="Laporkan masalah" data-en="Report an issue">Laporkan masalah</a></div></section>
+  </main>
+
+  <footer class="wrap footer"><span>© 2026 LajuMirror contributors · MIT License</span><div class="footer-links"><a href="https://github.com/FauzanYanuarPutra/laju-mirror" target="_blank" rel="noopener">GitHub</a><a href="https://github.com/FauzanYanuarPutra/laju-mirror/tree/main/docs" target="_blank" rel="noopener">Documentation</a><a href="https://github.com/FauzanYanuarPutra/laju-mirror/blob/main/docs/PRIVACY.md" target="_blank" rel="noopener">Privacy</a><a href="https://github.com/FauzanYanuarPutra/laju-mirror/blob/main/LICENSE" target="_blank" rel="noopener">License</a></div></footer>
+
+  <script>
+    (() => {
+      const button = document.getElementById("languageToggle");
+      let language = "id";
+      button.addEventListener("click", () => {
+        language = language === "id" ? "en" : "id";
+        document.documentElement.lang = language;
+        button.textContent = language === "id" ? "ID / EN" : "EN / ID";
+        document.querySelectorAll("[data-id][data-en]").forEach((element) => {
+          element.textContent = element.getAttribute("data-" + language);
+        });
+        if (language === "en") location.hash = "english";
+        else if (location.hash === "#english") history.replaceState(null, "", location.pathname + location.search);
+      });
+    })();
+  </script>
+</body>
+</html>
