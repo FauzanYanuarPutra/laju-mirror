@@ -116,7 +116,8 @@ h1 span+span{color:#86e5b0}
 .compact-form>p{margin:-3px 0 1px;font-size:9px;line-height:1.45;color:#819c8b}
 .port-field{display:flex;align-items:center;gap:7px;padding-left:9px;border:1px solid rgba(180,218,194,.14);border-radius:7px;color:#88a895;font-size:9px}
 .port-field input{width:55px;border:0;border-left:1px solid rgba(180,218,194,.12);border-radius:0;background:transparent;padding-left:8px}
-.disconnect-link{display:flex;align-items:center;gap:6px;margin-top:11px;padding:0;border:0;background:transparent;color:#91b6a0;font-size:9px}
+.wifi-footer-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:11px}
+.disconnect-link{display:flex;align-items:center;gap:6px;margin-top:0;padding:0;border:0;background:transparent;color:#91b6a0;font-size:9px}
 .settings-panel{display:flex;flex-direction:column}
 .heading-icon{color:#82c99c}
 .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 10px}
