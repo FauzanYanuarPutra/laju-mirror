@@ -8,7 +8,9 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "check": "tsc --noEmit",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "dev:windows": "powershell -NoProfile -File scripts/dev-windows.ps1",
+    "diagnostics:windows": "powershell -NoProfile -File scripts/windows-diagnostics.ps1"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.8.0",
