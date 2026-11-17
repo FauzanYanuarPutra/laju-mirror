@@ -1,78 +1,71 @@
 # Windows Application Control and LajuMirror
 
-This guide explains why Windows can block local builds and how to request a legitimate review.
+This guide explains the confirmed local-build block and the supported ways to work around it without weakening Windows security.
 
-## Why the local build is blocked
+## What the diagnostic report confirmed
 
-The reported error is:
+The report from this development PC showed:
 
-~~~text
-An Application Control policy has blocked this file. (os error 4551)
-...src-tauri/target/debug/build/.../build-script-build.exe
-~~~
+- Active enforced policy: `VerifiedAndReputableDesktop`.
+- `VerifiedAndReputablePolicyState = 1`.
+- Code Integrity event 3077 for Cargo-generated Rust dependency executables, including `serde_core`, `proc-macro2`, `thiserror`, `icu_normalizer_data`, and `icu_properties_data`.
+- An earlier event 3077 for the native Rollup Node module.
 
-This is not an Android permission prompt and it is not a normal UAC elevation issue.
+This is consistent with Smart App Control enforcement. The block is not a normal UAC permission prompt. Cargo compiles package build scripts into temporary executables and runs them while building dependencies. The policy can block those unsigned temporary programs before the application itself is produced.
 
-Cargo compiles package build scripts into temporary executables and runs them while compiling Rust dependencies. The blocked names in the report (for example, proc-macro2, serde_core, and icu_normalizer_data) are dependency build scripts. Updating Rust or running PowerShell as administrator does not override an enforced application-control policy.
+## Important limitation
 
-## What LajuMirror provides
+LajuMirror cannot add itself to a Smart App Control allow-list, and there is no supported per-app "Allow anyway" button for Smart App Control. An application cannot grant itself a Windows Code Integrity exception through JavaScript, Rust, PowerShell, a UAC modal, or an installer.
 
-Run the read-only helper from the repository root:
+Changing the app's source code alone cannot make Windows trust arbitrary unsigned build scripts. Do not disable Smart App Control, alter Code Integrity registry settings, install a broad allow rule, or whitelist an entire user-writable development folder.
 
-~~~powershell
-.scriptswindows-diagnostics.ps1
-~~~
+## Recommended workflow for this PC
 
-It asks for explicit consent before collecting Windows version, development-tool versions, active policy information when available, and recent Code Integrity / AppLocker events. It saves a text report on the Desktop (or in the temporary folder).
+Use GitHub Actions as the Windows build machine. This avoids executing Rust dependency build scripts on the protected laptop.
 
-If Windows denies access to event logs, the helper offers to relaunch itself with a standard UAC prompt. That elevation is only for reading diagnostics. It does not install, remove, or modify any policy and does not unblock executables.
+1. Push the source changes to the `main` branch, or open the [LajuMirror CI workflow](https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml).
+2. To start a build manually, open **Actions → CI → Run workflow**, select `main`, and run it.
+3. Wait for the Windows job to finish successfully.
+4. Open that workflow run and download the `lajumirror-windows-installers` artifact.
+5. Check `release-manifest.json` and `SHA256SUMS.txt` before installing.
 
-To start the local development app with a confirmation and automatic diagnostics after a failed build:
+The CI workflow runs TypeScript checks, builds the frontend, prepares the Windows package, builds MSI and NSIS installers, checks Rust formatting and the Rust backend, and uploads the installer artifacts. Artifacts are retained for 14 days.
 
-~~~powershell
-npm run dev:windows
-~~~
+This is a remote build route, not a per-app Smart App Control exception. The installer must still satisfy Windows trust checks.
 
-## How to request administrator approval
+## Code signing
 
-Give the generated report to the administrator who manages the computer. Ask them to review:
+Smart App Control allows binaries it recognizes as safe or binaries signed with a code-signing certificate issued by a certificate authority in Microsoft's Trusted Root Program. The publisher certificate must be trusted by Windows. Self-signed development certificates do not provide public trust.
 
-- Code Integrity event 3077 for enforced App Control blocks.
-- Code Integrity event 3076 for files that would be blocked under an audit policy.
-- Correlated event 3089 for file-signature and publisher details.
-- AppLocker MSI and Script events if the block comes from that rule collection.
+The Tauri bundle is configured to call `src-tauri/sign-windows-file.ps1` for its application executable. The release workflows also sign the MSI and NSIS installers when a trusted certificate is configured.
 
-The administrator should identify the active policy and choose a narrow, reviewed allow rule for the exact trusted software. Do not request a blanket exception for all executables under a user-writable folder or for all child processes of PowerShell, Node.js, Cargo, or rustc.
+Configure these GitHub Actions repository secrets:
 
-## Recommended path for everyday users
+- `WINDOWS_SIGNING_PFX_BASE64`: base64-encoded PFX containing the trusted code-signing certificate and private key.
+- `WINDOWS_SIGNING_PFX_PASSWORD`: password for that PFX.
 
-Most users should not need Rust, Cargo, Visual Studio Build Tools, or a local compiler. The preferred distribution path is a Windows installer built on the project's controlled GitHub Actions runner.
+Add them under **GitHub repository → Settings → Secrets and variables → Actions**. Keep the private key out of the repository, source code, logs, and downloadable artifacts. The certificate must come from a provider trusted by Windows and be suitable for code signing.
 
-For devices enforcing Smart App Control or enterprise App Control, broad distribution may also require a trusted Authenticode code-signing certificate and, for managed devices, an administrator-approved publisher rule. A self-signed developer certificate is not a substitute for a trusted public code-signing identity.
+Without both secrets, CI deliberately completes an unsigned build and reports its signature state in the manifest. A successful build does not mean an unsigned installer will pass Smart App Control. Signing the outer installer alone is also not a guarantee: Windows can evaluate the app executable and other binaries separately.
 
-Smart App Control does not provide an application-specific "allow this one anyway" confirmation for an arbitrary unsigned executable. It relies on Microsoft's reputation/intelligence checks and trusted signing. Enterprise App Control and AppLocker rules are controlled by the device administrator.
+For public open-source projects, [SignPath Foundation](https://signpath.org/) offers free signing for projects that meet its eligibility and review conditions. LajuMirror has not been approved by that program. Its conditions include an already released, actively maintained project and signing only eligible project-owned binaries; upstream scrcpy/ADB binaries require separate attention.
 
-## Signing support for official releases
+## What gets recorded
 
-The release workflow supports Authenticode signing when the repository owner configures these GitHub Actions secrets:
+The CI manifest records the SHA-256 hash and Authenticode status of the LajuMirror application executable, bundled runtime executables and DLLs, and generated MSI/NSIS installers. The manifest does not declare unsigned files trusted. Any unsigned or invalid binary must be reviewed before distributing a release to Smart App Control users.
 
-- `WINDOWS_SIGNING_PFX_BASE64`: the base64-encoded PFX containing the code-signing certificate and private key.
-- `WINDOWS_SIGNING_PFX_PASSWORD`: the PFX password.
+## Local UI work
 
-The certificate must be a legitimate code-signing certificate trusted by the Windows trust chain. Configure the secrets under **GitHub repository → Settings → Secrets and variables → Actions**. Keep the private key and password out of the repository, Actions artifacts, and logs. Do not use a self-signed development certificate as a substitute for a trusted public signing identity. Without both secrets, the workflow deliberately publishes unsigned installers.
+The frontend-only Vite server can still be started with `npm run dev` for UI work. It does not provide the native Rust/ADB/scrcpy backend. Running `npm run tauri dev` still requires Cargo to execute its generated build scripts locally and may therefore be blocked by the active policy.
 
-The same signing helper is used for CI artifacts and tagged releases. It writes the PFX to the temporary GitHub runner workspace, signs and verifies MSI/EXE installers, then removes the temporary PFX file.
+## Administrator-managed App Control
 
-Even a signed release is not guaranteed to pass every enterprise policy. A device administrator may still need to approve the certificate publisher through the organization's App Control or AppLocker policy.
+For Enterprise App Control or AppLocker, only the device administrator can deploy an appropriate narrow publisher or file rule. Give the administrator the diagnostic report and the exact file identity. Do not request a blanket exception for all executables under a writable folder or all child processes of PowerShell, Node.js, Cargo, or rustc.
 
 ## What LajuMirror intentionally does not do
 
 - It does not disable or weaken Windows security.
-- It does not edit WDAC, App Control, Smart App Control, AppLocker, Defender, or registry policy values.
+- It does not edit WDAC, Smart App Control, AppLocker, Defender, or registry policy values.
 - It does not install a broad allow-list.
-- It does not silently elevate the whole desktop app.
-- It does not claim that clicking a LajuMirror confirmation can override Windows enforcement.
-
-This is intentional. A user confirmation inside an application is not a valid security-policy decision by Windows.
-
-For AppLocker-managed devices, an administrator can configure a support URL in the blocked-app message using Group Policy. This is an administrator-managed help path, not an app-controlled allow button. See Microsoft's [custom AppLocker blocked-app message guidance](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/display-a-custom-url-message-when-users-try-to-run-a-blocked-application).
+- It does not silently elevate the entire desktop app.
+- It does not claim that an application confirmation can override Windows enforcement.
