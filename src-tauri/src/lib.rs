@@ -438,6 +438,14 @@ fn enable_tcpip(app: AppHandle, serial: String, port: u16) -> CommandResult {
 }
 
 #[tauri::command]
+fn restore_usb_mode(app: AppHandle, serial: String) -> CommandResult {
+    if let Err(message) = validate_serial(&serial) {
+        return CommandResult { success: false, message };
+    }
+    command_result(run_adb(&app, &["-s", &serial, "usb"]))
+}
+
+#[tauri::command]
 fn disconnect_device(app: AppHandle, serial: String) -> CommandResult {
     if let Err(message) = validate_serial(&serial) {
         return CommandResult { success: false, message };
@@ -457,6 +465,7 @@ pub fn run() {
             pair_device,
             connect_wifi_device,
             enable_tcpip,
+            restore_usb_mode,
             disconnect_device
         ])
         .run(tauri::generate_context!())
