@@ -317,6 +317,15 @@ fn start_mirror(
         .lock()
         .map_err(|_| "The mirroring process registry is unavailable.".to_string())?;
 
+    // The current desktop UI manages one mirroring window at a time.
+    // Remove stale child handles before checking for another active session.
+    registry.retain(|_, child| matches!(child.try_wait(), Ok(None)));
+    if let Some((active_serial, _)) = registry.iter().find(|(active_serial, _)| *active_serial != &serial) {
+        return Err(format!(
+            "Mirroring is already active for {active_serial}. Stop that session before starting another device."
+        ));
+    }
+
     let existing_status = registry
         .get_mut(&serial)
         .map(|existing| existing.try_wait());
