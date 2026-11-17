@@ -140,6 +140,7 @@ function App() {
   const [maxSize, setMaxSize] = useState("1080");
   const [fps, setFps] = useState("60");
   const [bitrate, setBitrate] = useState("12M");
+  const [fullscreen, setFullscreen] = useState(false);
   const [pairAddress, setPairAddress] = useState("");
   const [pairCode, setPairCode] = useState("");
   const [connectAddress, setConnectAddress] = useState("");
@@ -214,6 +215,7 @@ function App() {
         maxSize: Number(maxSize),
         maxFps: Number(fps),
         bitrate,
+        fullscreen,
       });
       setRunningSerial(selectedSerial);
       return { success: true, message };
@@ -412,6 +414,10 @@ function App() {
             <label className="setting-field"><span>{t.fps}</span><span className="select-wrap"><select value={fps} onChange={(e) => setFps(e.target.value)}><option value="30">30 FPS</option><option value="60">60 FPS</option></select><ChevronDown size={14} /></span></label>
             <label className="setting-field full-field"><span>{t.bitrate}</span><span className="select-wrap"><select value={bitrate} onChange={(e) => setBitrate(e.target.value)}><option value="4M">{lang === "id" ? "Hemat · 4 Mbps" : "Data saver · 4 Mbps"}</option><option value="8M">Balanced · 8 Mbps</option><option value="12M">High · 12 Mbps</option><option value="20M">Very high · 20 Mbps</option></select><ChevronDown size={14} /></span></label>
           </div>
+          <label className="fullscreen-option">
+            <input type="checkbox" checked={fullscreen} onChange={(event) => setFullscreen(event.target.checked)} />
+            <span>{lang === "id" ? "Buka langsung dalam layar penuh" : "Start in fullscreen"}</span>
+          </label>
           <div className="audio-card">
             <span className="audio-icon"><Volume2 size={17} /></span>
             <span className="audio-copy"><strong>{t.audio}</strong><small>{t.audioHint}</small></span>
