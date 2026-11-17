@@ -9,7 +9,7 @@ $ErrorActionPreference = "Continue"
 function Test-IsAdministrator {
     try {
         $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
-        $principal = New-Object Security.Principal.WindowsPrincipal($identity)
+        $principal = New-Object -TypeName Security.Principal.WindowsPrincipal -ArgumentList $identity
         return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
     }
     catch { return $false }
@@ -52,6 +52,7 @@ Write-Host ""
 Write-Host "LajuMirror Windows diagnostics" -ForegroundColor Cyan
 Write-Host "Read-only: this tool inspects system details and recent application-control logs."
 Write-Host "It does NOT whitelist files, change Windows security, disable protections, or install software."
+Write-Host "Review the saved report before sharing it; event messages can contain local file paths and device or user names."
 Write-Host ""
 $consent = Read-Host "Do you consent to collect this diagnostic report? Type YES to continue"
 if ($consent -cne "YES") {
@@ -192,7 +193,7 @@ try {
     Write-Host $OutputPath -ForegroundColor White
 }
 catch {
-    Write-Host "Could not save report: " + $_.Exception.Message -ForegroundColor Red
+    Write-Host ("Could not save report: " + $_.Exception.Message) -ForegroundColor Red
     exit 3
 }
 
@@ -204,7 +205,7 @@ if ($codeIntegrityAccessDenied -and -not $isAdmin -and -not $Elevated) {
         $quotedOutput = '"' + $OutputPath + '"'
         $argumentList = "-NoProfile -File $quotedScript -Hours $Hours -Elevated -OutputPath $quotedOutput"
         try { Start-Process -FilePath "powershell.exe" -Verb RunAs -ArgumentList $argumentList }
-        catch { Write-Host "Could not start the elevated diagnostic: " + $_.Exception.Message -ForegroundColor Red }
+        catch { Write-Host ("Could not start the elevated diagnostic: " + $_.Exception.Message) -ForegroundColor Red }
     }
 }
 
