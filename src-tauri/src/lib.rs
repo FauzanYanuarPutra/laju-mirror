@@ -340,7 +340,17 @@ fn start_mirror(
         None => {}
     }
 
-    let child = hidden_command(&scrcpy)
+    let mut scrcpy_command = hidden_command(&scrcpy);
+    // Keep the bundled ADB executable and scrcpy DLLs discoverable when the
+    // user launches LajuMirror outside the extracted scrcpy directory.
+    if let Some(directory) = scrcpy
+        .parent()
+        .filter(|parent| !parent.as_os_str().is_empty())
+    {
+        scrcpy_command.current_dir(directory);
+    }
+
+    let child = scrcpy_command
         .args(args)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
