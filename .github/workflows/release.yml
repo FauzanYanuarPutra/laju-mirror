@@ -31,6 +31,9 @@ jobs:
       - name: Install frontend dependencies
         run: npm install
 
+      - name: Generate application icons
+        run: npm run tauri icon src-tauri/icons/icon.svg
+
       - name: Build MSI and NSIS installers
         run: npm run tauri build -- --bundles msi,nsis
 
