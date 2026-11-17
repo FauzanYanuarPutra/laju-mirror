@@ -70,6 +70,8 @@ npm run dev:windows
 
 The development app can use adb and scrcpy from src-tauri/resources/tools/scrcpy/ or from your system PATH. A packaged build includes the tools downloaded by the Windows preparation workflow.
 
+On Windows devices enforcing Application Control, local Rust builds may be blocked because Cargo runs generated dependency build scripts. Use `npm run diagnostics:windows` to collect a read-only report and see [Windows Application Control guidance](docs/WINDOWS-APP-CONTROL.md). A normal user prompt cannot override WDAC, Smart App Control, or AppLocker. For regular use, prefer the Windows installer built on GitHub Actions rather than compiling on the user's PC.
+
 ~~~powershell
 npm run check
 cargo fmt --manifest-path src-tauri/Cargo.toml
