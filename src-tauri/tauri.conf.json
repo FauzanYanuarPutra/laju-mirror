@@ -28,12 +28,21 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "msi"],
+    "targets": [
+      "nsis",
+      "msi"
+    ],
     "resources": {
       "resources/tools/scrcpy/*": "tools/scrcpy/"
     },
     "category": "Utility",
     "shortDescription": "Android screen mirroring for Windows",
-    "longDescription": "Mirror and control Android phones over USB or Wi-Fi while keeping audio on the phone."
+    "longDescription": "Mirror and control Android phones over USB or Wi-Fi while keeping audio on the phone.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico"
+    ]
   }
 }
