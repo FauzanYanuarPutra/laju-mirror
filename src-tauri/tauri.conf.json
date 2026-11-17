@@ -33,7 +33,8 @@
       "msi"
     ],
     "resources": {
-      "resources/tools/scrcpy/*": "tools/scrcpy/"
+      "resources/tools/scrcpy/*": "tools/scrcpy/",
+      "../THIRD-PARTY-NOTICES.md": "THIRD-PARTY-NOTICES.md"
     },
     "category": "Utility",
     "shortDescription": "Android screen mirroring for Windows",
