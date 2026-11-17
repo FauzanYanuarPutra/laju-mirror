@@ -103,6 +103,7 @@ foreach ($tool in @("node", "npm", "rustc", "cargo", "rustup", "git")) {
 }
 
 Add-Section -Lines $lines -Title "APPLICATION CONTROL POLICY SNAPSHOT"
+$adminRetryNeeded = $false
 $ciTool = Join-Path $env:windir "System32\CiTool.exe"
 if (Test-Path $ciTool) {
     try {
@@ -110,7 +111,11 @@ if (Test-Path $ciTool) {
         $lines.Add("CiTool -lp -json output:")
         foreach ($line in $policyOutput) { $lines.Add([string]$line) }
     }
-    catch { $lines.Add("CiTool query failed: " + $_.Exception.Message) }
+    catch {
+        $toolError = $_.Exception.Message
+        $lines.Add("CiTool query failed: " + $toolError)
+        if ($toolError -match "(?i)access is denied|unauthori[sz]ed|not allowed|privilege") { $adminRetryNeeded = $true }
+    }
 }
 else { $lines.Add("CiTool.exe was not found. This can depend on Windows version.") }
 
@@ -134,7 +139,6 @@ catch { $lines.Add("AppIDSvc information unavailable: " + $_.Exception.Message) 
 Add-Section -Lines $lines -Title "CODE INTEGRITY BLOCK / AUDIT EVENTS"
 $startTime = (Get-Date).AddHours(-$Hours)
 $codeIntegrityEvents = @()
-$codeIntegrityAccessDenied = $false
 $ciLogName = "Microsoft-Windows-CodeIntegrity/Operational"
 
 try {
@@ -162,7 +166,7 @@ try {
 catch {
     $message = $_.Exception.Message
     $lines.Add("Could not read Code Integrity events: " + $message)
-    if ($message -match "Access is denied|requested registry access is not allowed|UnauthorizedAccess") { $codeIntegrityAccessDenied = $true }
+    if ($message -match "(?i)access is denied|unauthori[sz]ed|not allowed|privilege") { $adminRetryNeeded = $true }
 }
 
 Add-Section -Lines $lines -Title "APPLOCKER MSI AND SCRIPT EVENTS"
@@ -181,7 +185,11 @@ try {
         if (-not [string]::IsNullOrWhiteSpace($eventRecord.Message)) { $lines.Add($eventRecord.Message) }
     }
 }
-catch { $lines.Add("Could not read AppLocker MSI and Script events: " + $_.Exception.Message) }
+catch {
+    $appLockerError = $_.Exception.Message
+    $lines.Add("Could not read AppLocker MSI and Script events: " + $appLockerError)
+    if ($appLockerError -match "(?i)access is denied|unauthori[sz]ed|not allowed|privilege") { $adminRetryNeeded = $true }
+}
 
 Add-Section -Lines $lines -Title "NEXT STEPS"
 $lines.Add("1. Review Code Integrity event 3077 for enforced App Control blocks.")
@@ -204,7 +212,7 @@ catch {
     exit 3
 }
 
-if ($codeIntegrityAccessDenied -and -not $isAdmin -and -not $Elevated) {
+if ($adminRetryNeeded -and -not $isAdmin -and -not $Elevated) {
     Write-Host ""
     $elevate = Read-Host "Windows denied access to some event logs. Re-run this read-only diagnostic as administrator? UAC will appear. Type YES to continue"
     if ($elevate -ceq "YES") {
