@@ -86,6 +86,7 @@ npm run tauri build
 - [Quality and performance](docs/PERFORMANCE.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Windows Application Control and administrator approval](docs/WINDOWS-APP-CONTROL.md)
+- [Template request to IT administrator](docs/ADMIN-APPROVAL-REQUEST.md)
 - [Privacy and security](docs/PRIVACY.md)
 - [FAQ](docs/FAQ.md)
 - [Release checklist for maintainers](docs/RELEASE-CHECKLIST.md)
