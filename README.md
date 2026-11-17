@@ -10,7 +10,7 @@ Project website: https://fauzanyanuarputra.github.io/laju-mirror/
 
 LajuMirror is a lightweight Windows desktop companion for mirroring and controlling Android devices over USB or Wi-Fi. It wraps the proven [scrcpy](https://github.com/Genymobile/scrcpy) engine in a friendly interface, so everyday users do not need to remember terminal commands.
 
-> **Project status:** early development. USB and Wi-Fi workflows are being implemented. Prebuilt installers will be published in GitHub Releases after the Windows CI build is verified.
+> **Project status:** early development. USB and Wi-Fi workflows are being implemented. Prebuilt installers will be published in GitHub Releases after the Windows CI build and device testing are verified.
 
 ## What it aims to do
 
@@ -22,15 +22,19 @@ LajuMirror is a lightweight Windows desktop companion for mirroring and controll
 - Detect connected devices and show actionable connection status.
 - Offer Indonesian and English help for setup and troubleshooting.
 
-## Download
+## Download and remote Windows build
 
-Installers will be published on the [Releases page](https://github.com/FauzanYanuarPutra/laju-mirror/releases). Until a release is available, build from source using the instructions below.
+Official installers will be published on the [Releases page](https://github.com/FauzanYanuarPutra/laju-mirror/releases). For a build from the current source, open [GitHub Actions → CI](https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml), select a successful run, and download its `lajumirror-windows-installers` artifact.
+
+The CI workflow also supports manual runs: open **Actions → CI → Run workflow**, choose the `main` branch, and start the Windows build. This is useful when local Rust build scripts are blocked by Smart App Control because compilation takes place on a GitHub-hosted Windows runner, not on the developer's laptop.
+
+**Important:** remote compilation does not create a Smart App Control exception. An unsigned installer or unsigned binary can still be blocked when downloaded or launched. The build manifest reports hashes and Authenticode signature status. A trusted code-signing certificate must be configured in GitHub Actions for signed builds.
 
 LajuMirror currently targets **Windows 10/11, 64-bit**. An Android phone with USB debugging or Wireless Debugging enabled is required.
 
 ## Quick start
 
-1. Install LajuMirror from a release.
+1. Install LajuMirror from a verified GitHub Release.
 2. On your Android phone, open **Settings → About phone** and tap **Build number / OS version** repeatedly until Developer options are enabled. The exact label varies by phone.
 3. Open **Settings → Additional settings / System → Developer options** and enable **USB debugging**.
 4. Connect the phone with a data-capable USB cable and accept the debugging authorization prompt on the phone.
@@ -49,7 +53,7 @@ Use Wi-Fi only on a trusted private network. Android may change the phone's IP a
 
 ## Audio behavior
 
-LajuMirror starts scrcpy with audio forwarding disabled (the --no-audio option). This is designed for the use case where the phone remains the audio output device while the laptop displays the screen. It does not promise to route laptop system audio back to the phone, and it does not change the phone's own volume or media-output selection.
+LajuMirror starts scrcpy with audio forwarding disabled (the `--no-audio` option). This is designed for the use case where the phone remains the audio output device while the laptop displays the screen. It does not promise to route laptop system audio back to the phone, and it does not change the phone's own volume or media-output selection.
 
 ## Build from source
 
@@ -65,16 +69,22 @@ Requirements:
 git clone https://github.com/FauzanYanuarPutra/laju-mirror.git
 cd laju-mirror
 npm install
+npm run dev
+~~~
+
+`npm run dev` starts the frontend only. It is useful for UI work but does not provide the native Rust, ADB, or scrcpy backend.
+
+To run the full desktop development app on a machine that allows local Rust builds:
+
+~~~powershell
 npm run dev:windows
 ~~~
 
-The development app can use adb and scrcpy from src-tauri/resources/tools/scrcpy/ or from your system PATH. A packaged build includes the tools downloaded by the Windows preparation workflow.
-
-On Windows devices enforcing Application Control, local Rust builds may be blocked because Cargo runs generated dependency build scripts. Use `npm run diagnostics:windows` to collect a read-only report and see [Windows Application Control guidance](docs/WINDOWS-APP-CONTROL.md). A normal user prompt cannot override WDAC, Smart App Control, or AppLocker. For regular use, prefer the Windows installer built on GitHub Actions rather than compiling on the user's PC.
+On a device enforcing Smart App Control, local Cargo builds may be blocked because Cargo runs generated dependency build scripts. Do not try to grant the app an exception through code or weaken Windows security. Use the [remote Windows CI build](docs/WINDOWS-APP-CONTROL.md) instead. The installer signature status is recorded in `release-manifest.json`.
 
 ~~~powershell
 npm run check
-cargo fmt --manifest-path src-tauri/Cargo.toml
+cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
 cargo check --manifest-path src-tauri/Cargo.toml
 npm run tauri icon src-tauri/icons/icon.svg
 npm run tauri build
@@ -87,8 +97,7 @@ npm run tauri build
 - [Wi-Fi connection](docs/WIFI.md)
 - [Quality and performance](docs/PERFORMANCE.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
-- [Windows Application Control and administrator approval](docs/WINDOWS-APP-CONTROL.md)
-- [Template request to IT administrator](docs/ADMIN-APPROVAL-REQUEST.md)
+- [Windows Application Control and remote builds](docs/WINDOWS-APP-CONTROL.md)
 - [Privacy and security](docs/PRIVACY.md)
 - [FAQ](docs/FAQ.md)
 - [Release checklist for maintainers](docs/RELEASE-CHECKLIST.md)
