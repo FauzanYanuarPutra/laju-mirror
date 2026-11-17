@@ -65,7 +65,7 @@ Requirements:
 git clone https://github.com/FauzanYanuarPutra/laju-mirror.git
 cd laju-mirror
 npm install
-npm run tauri dev
+npm run dev:windows
 ~~~
 
 The development app can use adb and scrcpy from src-tauri/resources/tools/scrcpy/ or from your system PATH. A packaged build includes the tools downloaded by the Windows preparation workflow.
@@ -85,6 +85,7 @@ npm run tauri build
 - [Wi-Fi connection](docs/WIFI.md)
 - [Quality and performance](docs/PERFORMANCE.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Windows Application Control and administrator approval](docs/WINDOWS-APP-CONTROL.md)
 - [Privacy and security](docs/PRIVACY.md)
 - [FAQ](docs/FAQ.md)
 - [Release checklist for maintainers](docs/RELEASE-CHECKLIST.md)
