@@ -17,6 +17,35 @@ Android belum mengizinkan komputer ini. Periksa layar HP, pastikan sidik jari RS
 
 Cabut dan sambungkan ulang kabel, buka kunci HP, lalu tekan Refresh. Jika memakai Wi-Fi, periksa apakah HP dan laptop masih berada di jaringan yang sama dan gunakan alamat serta port terbaru dari halaman Wireless Debugging.
 
+## Application Control memblokir Rollup di Windows
+
+Jika terminal menampilkan pesan:
+
+~~~text
+An Application Control policy has blocked this file.
+...rollup.win32-x64-msvc.node
+~~~
+
+Windows sedang menolak memuat native addon Rollup. Jangan mematikan Windows Defender, Smart App Control, WDAC, AppLocker, atau kebijakan keamanan organisasi hanya untuk menjalankan aplikasi.
+
+Versi LajuMirror terbaru mengganti dependency Rollup native dengan paket resmi `@rollup/wasm-node` melalui npm override. Untuk mengambil perbaikannya:
+
+~~~powershell
+git pull origin main
+npm install
+npm run tauri dev
+~~~
+
+Jika npm masih menyebut skrip instalasi esbuild belum disetujui, pastikan kamu berada di folder proyek dan jalankan:
+
+~~~powershell
+npm install-scripts ls
+npm install-scripts approve esbuild
+npm install
+~~~
+
+LajuMirror hanya memberi persetujuan pada skrip instalasi esbuild yang dipakai toolchain proyek; ini bukan pengecualian Windows Application Control. Bila kebijakan Windows tetap memblokir binary lain, minta administrator perangkat meninjau log Code Integrity/App Control dan mengizinkan komponen build yang telah diverifikasi. Pada perangkat kantor atau kampus, jangan mencoba melewati kebijakan organisasi.
+
 ## ADB atau scrcpy tidak ditemukan
 
 Installer yang dipublikasikan melalui workflow resmi disiapkan untuk membawa scrcpy dan ADB. Untuk development lokal, tempatkan file resmi scrcpy Windows di src-tauri/resources/tools/scrcpy atau tambahkan scrcpy dan ADB ke PATH.
