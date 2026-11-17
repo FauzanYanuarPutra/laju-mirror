@@ -8,6 +8,15 @@ export default defineConfig({
     port: 1420,
     strictPort: true,
     host: "127.0.0.1",
+    // Cargo writes executable build scripts, PDBs and other temporary files
+    // under src-tauri/target. Vite must not crawl or watch these files.
+    watch: {
+      ignored: [
+        "**/src-tauri/target/**",
+        "**/target/**",
+        "**/.git/**",
+      ],
+    },
   },
   envPrefix: ["VITE_", "TAURI_ENV_*"],
   build: {
