@@ -161,12 +161,16 @@ function App() {
 
   const refresh = useCallback(async () => {
     try {
-      const [nextDevices, nextTools] = await Promise.all([
+      const [nextDevices, nextTools, nextSessions] = await Promise.all([
         invoke<Device[]>("get_devices"),
         invoke<ToolsStatus>("check_tools"),
+        invoke<string[]>("get_running_sessions"),
       ]);
       setDevices(nextDevices);
       setTools(nextTools);
+      setRunningSerial((current) =>
+        current && nextSessions.includes(current) ? current : nextSessions[0] ?? "",
+      );
       setSelectedSerial((current) =>
         nextDevices.some((device) => device.serial === current)
           ? current
