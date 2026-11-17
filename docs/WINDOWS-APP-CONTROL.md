@@ -59,7 +59,9 @@ The release workflow supports Authenticode signing when the repository owner con
 - `WINDOWS_SIGNING_PFX_BASE64`: the base64-encoded PFX containing the code-signing certificate and private key.
 - `WINDOWS_SIGNING_PFX_PASSWORD`: the PFX password.
 
-The certificate must be a legitimate code-signing certificate trusted by the Windows trust chain. Do not commit a PFX file or password to the repository, and do not use a self-signed development certificate as a substitute for a trusted public signing identity. Without both secrets, the workflow deliberately publishes unsigned installers.
+The certificate must be a legitimate code-signing certificate trusted by the Windows trust chain. Configure the secrets under **GitHub repository → Settings → Secrets and variables → Actions**. Keep the private key and password out of the repository, Actions artifacts, and logs. Do not use a self-signed development certificate as a substitute for a trusted public signing identity. Without both secrets, the workflow deliberately publishes unsigned installers.
+
+The same signing helper is used for CI artifacts and tagged releases. It writes the PFX to the temporary GitHub runner workspace, signs and verifies MSI/EXE installers, then removes the temporary PFX file.
 
 Even a signed release is not guaranteed to pass every enterprise policy. A device administrator may still need to approve the certificate publisher through the organization's App Control or AppLocker policy.
 
