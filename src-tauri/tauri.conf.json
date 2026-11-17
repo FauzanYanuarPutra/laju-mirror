@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "LajuMirror",
+  "version": "0.1.0",
+  "identifier": "com.lajukan.lajumirror",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://127.0.0.1:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "LajuMirror",
+        "width": 1280,
+        "height": 900,
+        "minWidth": 360,
+        "minHeight": 700,
+        "center": true,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi"],
+    "resources": {
+      "resources/tools/scrcpy/*": "tools/scrcpy/"
+    },
+    "category": "Utility",
+    "shortDescription": "Android screen mirroring for Windows",
+    "longDescription": "Mirror and control Android phones over USB or Wi-Fi while keeping audio on the phone."
+  }
+}
