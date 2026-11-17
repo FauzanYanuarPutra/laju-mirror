@@ -1,0 +1,58 @@
+name: Bug report
+description: Report a reproducible problem in LajuMirror.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "Please remove private information such as device serials, pairing codes, public IP addresses and personal screen content."
+  - type: input
+    id: version
+    attributes:
+      label: LajuMirror version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Windows version
+      placeholder: "Windows 11 24H2"
+    validations:
+      required: true
+  - type: input
+    id: android
+    attributes:
+      label: Android device and Android version
+      placeholder: "Xiaomi model, Android version"
+    validations:
+      required: true
+  - type: dropdown
+    id: connection
+    attributes:
+      label: Connection type
+      options:
+        - USB
+        - Wireless Debugging
+        - ADB TCP/IP
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Describe the exact steps that lead to the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and error message
+    validations:
+      required: true
