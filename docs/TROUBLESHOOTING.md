@@ -17,6 +17,26 @@ Android belum mengizinkan komputer ini. Periksa layar HP, pastikan sidik jari RS
 
 Cabut dan sambungkan ulang kabel, buka kunci HP, lalu tekan Refresh. Jika memakai Wi-Fi, periksa apakah HP dan laptop masih berada di jaringan yang sama dan gunakan alamat serta port terbaru dari halaman Wireless Debugging.
 
+## Application Control memblokir proses build Rust di Windows
+
+Jika terminal menunjukkan error `An Application Control policy has blocked this file` pada executable di `src-tauri/target/debug/build/`, Cargo sedang mencoba menjalankan build script dependency yang baru dikompilasi. Ini bukan error versi Rust dan bukan permintaan izin Android.
+
+Jalankan pemeriksaan read-only yang tersedia di proyek:
+
+~~~powershell
+npm run diagnostics:windows
+~~~
+
+Untuk menjalankan development app dengan persetujuan awal dan mengumpulkan diagnostik jika proses gagal:
+
+~~~powershell
+npm run dev:windows
+~~~
+
+Alat diagnostik hanya membaca informasi dan log. Bila log tidak bisa dibaca tanpa hak administrator, alat menawarkan prompt UAC untuk menjalankan pengumpulan log sebagai administrator. Prompt tersebut tidak mengubah atau melewati kebijakan Application Control.
+
+Lihat [Windows Application Control](WINDOWS-APP-CONTROL.md) untuk penjelasan dan jalur permintaan resmi kepada administrator.
+
 ## Application Control memblokir Rollup di Windows
 
 Jika terminal menampilkan pesan:
