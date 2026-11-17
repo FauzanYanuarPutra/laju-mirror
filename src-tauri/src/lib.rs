@@ -12,6 +12,17 @@ use tauri::{AppHandle, Manager, State};
 #[derive(Default)]
 struct ProcessRegistry(Mutex<HashMap<String, Child>>);
 
+impl Drop for ProcessRegistry {
+    fn drop(&mut self) {
+        if let Ok(children) = self.0.get_mut() {
+            for child in children.values_mut() {
+                let _ = child.kill();
+                let _ = child.wait();
+            }
+        }
+    }
+}
+
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct DeviceInfo {
@@ -302,13 +313,18 @@ fn start_mirror(
         .lock()
         .map_err(|_| "The mirroring process registry is unavailable.".to_string())?;
 
-    if let Some(existing) = registry.get_mut(&serial) {
-        match existing.try_wait() {
-            Ok(None) => return Err("Mirroring is already running for this device.".to_string()),
-            Ok(Some(_)) | Err(_) => {
-                registry.remove(&serial);
-            }
+    let existing_status = registry
+        .get_mut(&serial)
+        .map(|existing| existing.try_wait());
+
+    match existing_status {
+        Some(Ok(None)) => {
+            return Err("Mirroring is already running for this device.".to_string());
         }
+        Some(Ok(Some(_))) | Some(Err(_)) => {
+            registry.remove(&serial);
+        }
+        None => {}
     }
 
     let child = hidden_command(&scrcpy)
@@ -341,6 +357,28 @@ fn stop_mirror(state: State<'_, ProcessRegistry>, serial: String) -> Result<Stri
     let _ = child.kill();
     let _ = child.wait();
     Ok(format!("Mirroring stopped for {serial}."))
+}
+
+#[tauri::command]
+fn get_running_sessions(state: State<'_, ProcessRegistry>) -> Result<Vec<String>, String> {
+    let mut registry = state
+        .0
+        .lock()
+        .map_err(|_| "The mirroring process registry is unavailable.".to_string())?;
+
+    let finished: Vec<String> = registry
+        .iter_mut()
+        .filter_map(|(serial, child)| match child.try_wait() {
+            Ok(None) => None,
+            Ok(Some(_)) | Err(_) => Some(serial.clone()),
+        })
+        .collect();
+
+    for serial in finished {
+        registry.remove(&serial);
+    }
+
+    Ok(registry.keys().cloned().collect())
 }
 
 #[tauri::command]
@@ -400,6 +438,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             check_tools,
             get_devices,
+            get_running_sessions,
             start_mirror,
             stop_mirror,
             pair_device,
