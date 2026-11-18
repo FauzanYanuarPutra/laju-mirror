@@ -31,7 +31,35 @@ Write-Host "npm:" (npm --version)
 Write-Host "Rust:" (rustc --version)
 Write-Host "Cargo:" (cargo --version)
 Write-Host ""
-Write-Host "Starting LajuMirror. On a managed Windows device, App Control may block Cargo-generated build executables." -ForegroundColor Yellow
+
+# Smart App Control state is read-only here. This launcher never changes policy.
+$policyPath = "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\CI\\Policy"
+$smartAppControlState = $null
+try {
+    $policy = Get-ItemProperty -Path $policyPath -Name "VerifiedAndReputablePolicyState" -ErrorAction Stop
+    $smartAppControlState = [int]$policy.VerifiedAndReputablePolicyState
+} catch {
+    # Policy state unavailable: continue with the normal guarded development attempt.
+}
+
+if ($smartAppControlState -eq 1) {
+    Write-Host "Smart App Control enforcement is active on this Windows installation." -ForegroundColor Yellow
+    Write-Host "The diagnostic report confirmed that Windows blocks unsigned Cargo dependency build scripts." -ForegroundColor Yellow
+    Write-Host "A code change, UAC prompt, or administrator PowerShell window cannot grant an individual Smart App Control exception." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Frontend-only development (no Rust backend): npm run dev" -ForegroundColor Cyan
+    Write-Host "Full Windows build on GitHub Actions:" -ForegroundColor Cyan
+    Write-Host "https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml"
+    Write-Host ""
+    $choice = Read-Host "Open the remote Windows build page in your browser now? Type YES"
+    if ($choice -ceq "YES") {
+        Start-Process "https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml"
+    }
+    Write-Host "No Windows security settings were changed." -ForegroundColor Green
+    exit 3
+}
+
+Write-Host "Starting LajuMirror development app." -ForegroundColor Yellow
 npm run tauri dev
 $devExitCode = $LASTEXITCODE
 
