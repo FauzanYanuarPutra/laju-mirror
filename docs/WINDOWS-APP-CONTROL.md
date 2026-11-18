@@ -30,7 +30,7 @@ Use GitHub Actions as the Windows build machine. This avoids executing Rust depe
 5. Do not install this unsigned preview on a PC enforcing Smart App Control. Check `release-manifest.json` and `SHA256SUMS.txt`; a CI success does not establish publisher trust.
 6. Install only a signed release from the [Releases page](https://github.com/FauzanYanuarPutra/laju-mirror/releases) after the project publishes one.
 
-The CI workflow runs TypeScript checks, builds the frontend, prepares the Windows package, builds MSI and NSIS installers, checks Rust formatting and the Rust backend, and uploads the installer artifacts. Artifacts are retained for 14 days.
+The CI workflow runs TypeScript checks, builds the frontend, prepares the pinned official scrcpy/ADB package, builds MSI and NSIS installers, checks Rust formatting and the Rust backend, and uploads the installer artifacts. Artifacts are retained for 14 days. The runtime download is pinned to scrcpy v5.0.1 and its reviewed Windows x64 archive SHA-256; bump the version and digest together only after reviewing the upstream release.
 
 This is a remote build route, not a per-app Smart App Control exception. The installer must still satisfy Windows trust checks.
 
@@ -53,7 +53,7 @@ For public open-source projects, [SignPath Foundation](https://signpath.org/) of
 
 ## What gets recorded
 
-The CI manifest records the SHA-256 hash and Authenticode status of the LajuMirror application executable, bundled runtime executables and DLLs, and generated MSI/NSIS installers. The manifest does not declare unsigned files trusted. Any unsigned or invalid binary must be reviewed before distributing a release to Smart App Control users.
+The CI manifest records the SHA-256 hash and Authenticode status of the LajuMirror application executable, bundled runtime executables and DLLs, and generated MSI/NSIS installers. The manifest does not declare unsigned files trusted. Release verification also checks that every packaged runtime EXE/DLL, the LajuMirror app binary, and both installer formats are present in the manifest, hash-matched, and Authenticode-valid. Any unsigned or invalid binary blocks publication.
 
 ## Local UI work
 
