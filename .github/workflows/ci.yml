@@ -50,6 +50,19 @@ jobs:
             }
           }
 
+      - name: Validate Tauri security policy
+        shell: pwsh
+        run: |
+          $config = Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json
+          $csp = $config.app.security.csp
+          if ($null -eq $csp) { throw "Production CSP must not be null." }
+          if ($csp.'default-src' -notmatch "'self'" -or $csp.'connect-src' -notmatch "ipc:") {
+            throw "Production CSP must allow local assets and Tauri IPC only."
+          }
+          if ($csp.'object-src' -ne "'none'") {
+            throw "Production CSP must disable embedded object content."
+          }
+
       - name: TypeScript check
         run: npm run check
 
