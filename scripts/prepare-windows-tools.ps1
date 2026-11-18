@@ -12,6 +12,12 @@ $headers = @{
   "Accept" = "application/vnd.github+json"
   "User-Agent" = "LajuMirror-Windows-Build"
 }
+
+# Prefer the per-run GitHub token to avoid shared anonymous API rate limits.
+# The token is never written to the workflow log or included in artifacts.
+if (-not [string]::IsNullOrWhiteSpace($env:GITHUB_TOKEN)) {
+  $headers["Authorization"] = "Bearer $env:GITHUB_TOKEN"
+}
 $release = Invoke-RestMethod -Uri "$repo/releases/latest" -Headers $headers
 $asset = $release.assets | Where-Object { $_.name -match "^scrcpy-win64-.*\.zip$" } | Select-Object -First 1
 
