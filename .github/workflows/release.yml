@@ -26,6 +26,8 @@ jobs:
 
       - name: Prepare official scrcpy and ADB binaries
         shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: ./scripts/prepare-windows-tools.ps1
 
       - name: Install frontend dependencies
