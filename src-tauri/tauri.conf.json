@@ -50,7 +50,7 @@
           "-ExecutionPolicy",
           "Bypass",
           "-File",
-          "sign-windows-file.ps1",
+          "src-tauri/sign-windows-file.ps1",
           "%1"
         ]
       }
