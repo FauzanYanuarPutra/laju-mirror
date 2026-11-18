@@ -111,7 +111,11 @@ fn output_text(output: &Output) -> String {
     let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
     let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
     if output.status.success() {
-        if stdout.is_empty() { stderr } else { stdout }
+        if stdout.is_empty() {
+            stderr
+        } else {
+            stdout
+        }
     } else if stderr.is_empty() {
         if stdout.is_empty() {
             format!("Process exited with status {}", output.status)
@@ -136,7 +140,10 @@ fn command_result(result: Result<Output, String>) -> CommandResult {
             success: output.status.success(),
             message: output_text(&output),
         },
-        Err(message) => CommandResult { success: false, message },
+        Err(message) => CommandResult {
+            success: false,
+            message,
+        },
     }
 }
 
@@ -196,7 +203,16 @@ fn check_tools(app: AppHandle) -> ToolsStatus {
     let scrcpy_version = version_for(&app, "scrcpy");
     let resource_dir = app.path().resource_dir().ok();
     let bundled = resource_dir
-        .map(|path| path.join("tools").join("scrcpy").join(if cfg!(windows) { "scrcpy.exe" } else { "scrcpy" }).is_file())
+        .map(|path| {
+            path.join("tools")
+                .join("scrcpy")
+                .join(if cfg!(windows) {
+                    "scrcpy.exe"
+                } else {
+                    "scrcpy"
+                })
+                .is_file()
+        })
         .unwrap_or(false);
 
     ToolsStatus {
@@ -257,7 +273,9 @@ fn get_devices(app: AppHandle) -> Result<Vec<DeviceInfo>, String> {
     devices.sort_by(|left, right| {
         let left_ready = left.state == "device";
         let right_ready = right.state == "device";
-        right_ready.cmp(&left_ready).then_with(|| left.serial.cmp(&right.serial))
+        right_ready
+            .cmp(&left_ready)
+            .then_with(|| left.serial.cmp(&right.serial))
     });
     Ok(devices)
 }
@@ -320,7 +338,10 @@ fn start_mirror(
     // The current desktop UI manages one mirroring window at a time.
     // Remove stale child handles before checking for another active session.
     registry.retain(|_, child| matches!(child.try_wait(), Ok(None)));
-    if let Some((active_serial, _)) = registry.iter().find(|(active_serial, _)| *active_serial != &serial) {
+    if let Some((active_serial, _)) = registry
+        .iter()
+        .find(|(active_serial, _)| *active_serial != &serial)
+    {
         return Err(format!(
             "Mirroring is already active for {active_serial}. Stop that session before starting another device."
         ));
@@ -363,7 +384,9 @@ fn start_mirror(
         })?;
 
     registry.insert(serial.clone(), child);
-    Ok(format!("Mirroring started for {serial}. Audio forwarding is disabled."))
+    Ok(format!(
+        "Mirroring started for {serial}. Audio forwarding is disabled."
+    ))
 }
 
 #[tauri::command]
@@ -407,7 +430,10 @@ fn get_running_sessions(state: State<'_, ProcessRegistry>) -> Result<Vec<String>
 #[tauri::command]
 fn pair_device(app: AppHandle, pairing_address: String, pairing_code: String) -> CommandResult {
     if let Err(message) = validate_host_port(&pairing_address) {
-        return CommandResult { success: false, message };
+        return CommandResult {
+            success: false,
+            message,
+        };
     }
     let code = pairing_code.trim();
     if !(4..=8).contains(&code.len()) || !code.chars().all(|character| character.is_ascii_digit()) {
@@ -417,10 +443,7 @@ fn pair_device(app: AppHandle, pairing_address: String, pairing_code: String) ->
         };
     }
 
-    command_result(run_adb(
-        &app,
-        &["pair", pairing_address.trim(), code],
-    ))
+    command_result(run_adb(&app, &["pair", pairing_address.trim(), code]))
 }
 
 #[tauri::command]
@@ -480,4 +503,51 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running LajuMirror");
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::{validate_host_port, validate_port, validate_serial};
+
+    #[test]
+    fn serial_validation_accepts_usb_and_wifi_serials() {
+        assert!(validate_serial("R58M123456A").is_ok());
+        assert!(validate_serial("192.168.1.8:5555").is_ok());
+    }
+
+    #[test]
+    fn serial_validation_rejects_empty_or_whitespace_values() {
+        assert!(validate_serial("").is_err());
+        assert!(validate_serial("   ").is_err());
+        assert!(validate_serial("device serial").is_err());
+    }
+
+    #[test]
+    fn port_validation_accepts_the_valid_range() {
+        assert!(validate_port(1).is_ok());
+        assert!(validate_port(5555).is_ok());
+        assert!(validate_port(u16::MAX).is_ok());
+    }
+
+    #[test]
+    fn port_validation_rejects_zero() {
+        assert!(validate_port(0).is_err());
+    }
+
+    #[test]
+    fn host_port_validation_accepts_ipv4_hostname_and_ipv6() {
+        assert!(validate_host_port("192.168.1.8:37123").is_ok());
+        assert!(validate_host_port("localhost:5555").is_ok());
+        assert!(validate_host_port("[::1]:5555").is_ok());
+    }
+
+    #[test]
+    fn host_port_validation_rejects_invalid_addresses() {
+        assert!(validate_host_port("").is_err());
+        assert!(validate_host_port("localhost").is_err());
+        assert!(validate_host_port("bad host:5555").is_err());
+        assert!(validate_host_port("192.168.1.8:0").is_err());
+        assert!(validate_host_port("192.168.1.8:65536").is_err());
+    }
 }
