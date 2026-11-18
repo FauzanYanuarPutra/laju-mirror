@@ -107,6 +107,7 @@ jobs:
           github-token: ${{ github.token }}
 
       - name: Package Microsoft Store MSIX
+        id: package-store-msix
         shell: pwsh
         env:
           LAJUMIRROR_STORE_IDENTITY_NAME: ${{ vars.LAJUMIRROR_STORE_IDENTITY_NAME }}
@@ -114,10 +115,22 @@ jobs:
           LAJUMIRROR_STORE_PUBLISHER_DISPLAY_NAME: ${{ vars.LAJUMIRROR_STORE_PUBLISHER_DISPLAY_NAME }}
         run: ./scripts/package-windows-store-msix.ps1
 
-      - name: Upload Microsoft Store MSIX package
+      - name: Upload Microsoft Store submission MSIX
+        if: steps.package-store-msix.outputs.store_submission_ready == 'true'
         uses: actions/upload-artifact@v7.0.2
         with:
-          name: lajumirror-windows-store-msix
+          name: lajumirror-windows-store-msix-submission
+          path: |
+            artifacts/windows-store/*.msix
+            artifacts/windows-store/store-msix-metadata.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload preview-only MSIX (Partner Center identity missing)
+        if: steps.package-store-msix.outputs.store_submission_ready != 'true'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: lajumirror-windows-store-msix-preview-only
           path: |
             artifacts/windows-store/*.msix
             artifacts/windows-store/store-msix-metadata.json

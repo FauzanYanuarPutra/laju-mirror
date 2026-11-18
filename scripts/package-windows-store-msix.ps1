@@ -312,6 +312,12 @@ try {
     Write-Host "Store submission ready: $submissionReady"
     Write-Host "Package metadata: $metadataPath"
 
+    if (-not [string]::IsNullOrWhiteSpace($env:GITHUB_OUTPUT)) {
+        $outputValue = $submissionReady.ToString().ToLowerInvariant()
+        "store_submission_ready=$outputValue" |
+            Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+    }
+
     if ($env:GITHUB_STEP_SUMMARY) {
         @(
             "### Microsoft Store MSIX package"

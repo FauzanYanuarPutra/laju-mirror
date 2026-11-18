@@ -19,7 +19,7 @@ The Windows CI workflow now:
 5. Opens the package and verifies that the executable, ADB, scrcpy, DLL resources, manifest, and Store assets are present.
 6. Writes \`store-msix-metadata.json\` with the package identity, SHA-256 digest, and whether a real Partner Center identity was supplied.
 
-The artifact is named \`lajumirror-windows-store-msix\`. The existing \`lajumirror-windows-unsigned-preview\` artifact remains for MSI/EXE build diagnostics only.
+When Partner Center identity variables are missing, the artifact is named \`lajumirror-windows-store-msix-preview-only\` and must not be submitted or installed. Once all exact Partner Center identity variables are configured, the artifact is named \`lajumirror-windows-store-msix-submission\`. The existing \`lajumirror-windows-unsigned-preview\` artifact remains for MSI/EXE build diagnostics only.
 
 ## One-time Partner Center setup
 
@@ -51,10 +51,10 @@ Do not put passwords, certificates, private keys, or personal identity documents
 1. Open [Actions → CI](https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml).
 2. Run the workflow on \`main\`.
 3. Wait for the Windows job to finish successfully.
-4. Download the \`lajumirror-windows-store-msix\` artifact.
-5. Open \`store-msix-metadata.json\` and confirm \`storeSubmissionReady\` is \`true\`. If it is \`false\`, the package was built with a preview identity and must not be submitted.
+4. Download \`lajumirror-windows-store-msix-submission\`. Do not download \`lajumirror-windows-store-msix-preview-only\` for submission.
+5. Open \`store-msix-metadata.json\` and confirm \`storeSubmissionReady\` is \`true\`, then verify the package identity and publisher exactly match Partner Center.
 6. Upload the \`.msix\` package in Partner Center for the reserved LajuMirror app.
-7. Complete Store listing fields, privacy information, screenshots, age rating, and certification checks.
+7. Complete Store listing fields, privacy information, screenshots, age rating, and certification checks. Use the public [LajuMirror privacy policy](https://github.com/FauzanYanuarPutra/laju-mirror/blob/main/docs/PRIVACY.md) in the listing's privacy policy URL field.
 8. Publish after Microsoft approves the submission.
 
 The package must not be installed directly before Store signing. An unsigned MSIX package is a submission input, not an installer for the protected laptop. Once Microsoft signs and publishes the app, install LajuMirror from its Microsoft Store listing.
