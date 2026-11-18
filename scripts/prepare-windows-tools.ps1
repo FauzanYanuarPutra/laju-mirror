@@ -31,7 +31,11 @@ New-Item -ItemType Directory -Path $destinationPath -Force | Out-Null
 
 $zipPath = Join-Path $temp $asset.name
 Write-Host "Downloading $($asset.name) from the official scrcpy release..."
-Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zipPath -Headers $headers
+# The archive is public. Do not forward the repository-scoped API token to the asset host.
+$downloadHeaders = @{
+  "User-Agent" = "LajuMirror-Windows-Build"
+}
+Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zipPath -Headers $downloadHeaders
 
 if ($asset.digest -and $asset.digest.StartsWith("sha256:")) {
   $expectedHash = $asset.digest.Substring(7).ToLowerInvariant()
