@@ -39,10 +39,11 @@ For a guided Windows setup, clone the repository and launch the control panel wi
 ~~~powershell
 git clone https://github.com/FauzanYanuarPutra/laju-mirror.git
 cd laju-mirror
-powershell -NoProfile -ExecutionPolicy Bypass -File .\laju.ps1
+git pull --ff-only
+powershell -NoProfile -ExecutionPolicy Bypass -File .\laju.ps1 -Mode Gui
 ~~~
 
-The LajuMirror control panel checks prerequisites, requests consent before downloading the official ADB/scrcpy tools, and offers one-click local development or unsigned local preview builds. If Smart App Control is enforcing policy, local run/build actions are blocked in the panel and it opens the code-signing guidance instead. CI artifacts are unsigned previews only and must not be installed on a PC enforcing Smart App Control. The launcher never disables Windows security or silently requests Administrator access. Android USB debugging and Wireless Debugging approval still have to be granted directly on the phone.
+The LajuMirror control panel checks prerequisites, requests consent before downloading the official ADB/scrcpy tools, and offers one-click local development or unsigned local preview builds. If Smart App Control is enforcing policy, the GUI still opens, but local run/build actions are disabled. Use **Microsoft Store Setup** in the panel to open the developer registration page and the Partner Center setup guide. The current unsigned CI artifacts are packaging outputs only; do not install them on a PC enforcing Smart App Control. The Store MSIX becomes installable only after its exact Partner Center identity is configured, the app passes Store certification, and Microsoft publishes the Store-signed package. The launcher never disables Windows security or silently requests Administrator access. Android USB debugging and Wireless Debugging approval still have to be granted directly on the phone.
 
 1. Install LajuMirror from a verified GitHub Release.
 2. On your Android phone, open **Settings → About phone** and tap **Build number / OS version** repeatedly until Developer options are enabled. The exact label varies by phone.

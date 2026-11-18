@@ -27,9 +27,13 @@ Use GitHub Actions as the Windows build machine. This avoids executing Rust depe
 2. Run **Actions → CI → Run workflow** on `main`.
 3. The workflow creates an unsigned MSI/EXE preview for build diagnostics and a separate unsigned MSIX package for Microsoft Store submission.
 4. Never install the MSI/EXE preview on a PC enforcing Smart App Control. The MSIX must first use the exact package identity from Partner Center and pass Store certification.
-5. Follow [Microsoft Store distribution](MICROSOFT-STORE.md) to create the developer account, reserve the app name, configure package identity, and submit the MSIX.
+5. The current MSIX build is only a packaging preview until `storeSubmissionReady` is `true`; it cannot be installed directly while unsigned.
+6. Follow [Microsoft Store distribution](MICROSOFT-STORE.md) to create the developer account, reserve the app name, configure the exact package identity, and submit the MSIX.
+7. Install LajuMirror from its Microsoft Store listing only after Microsoft completes certification and publishes the signed package.
 
 ## Code signing
+
+For LajuMirror's no-certificate route, use the Microsoft Store MSIX workflow described in [Microsoft Store distribution](MICROSOFT-STORE.md). The CI artifact is intentionally unsigned because Microsoft adds the trusted Store signature after certification; an MSIX with the preview identity is not a usable installer.
 
 Smart App Control allows binaries it recognizes as safe or binaries signed with a code-signing certificate issued by a certificate authority in Microsoft's Trusted Root Program. The publisher certificate must be trusted by Windows. Self-signed development certificates do not provide public trust.
 

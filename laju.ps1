@@ -35,13 +35,28 @@ function Test-AppControlEnforced {
 }
 
 function Show-SigningGuidance {
+    $registrationUrl = "https://storedeveloper.microsoft.com/"
+    $guideUrl = "https://github.com/FauzanYanuarPutra/laju-mirror/blob/main/docs/MICROSOFT-STORE.md"
+
     Write-Host ""
     Write-Host "Smart App Control is enforcing Windows application policy on this PC." -ForegroundColor Yellow
-    Write-Host "The MSI/EXE CI preview is unsigned and cannot be installed safely on this PC." -ForegroundColor Red
-    Write-Host "LajuMirror is preparing a Microsoft Store MSIX package. Microsoft signs Store-approved MSIX packages." -ForegroundColor Cyan
-    Write-Host "A Store developer account and the exact package identity from Partner Center are still required." -ForegroundColor Yellow
-    Write-Host "Create the developer account, reserve LajuMirror, then configure the repository variables described in docs/MICROSOFT-STORE.md." -ForegroundColor White
-    Write-Host "Do not disable Smart App Control or install the unsigned preview." -ForegroundColor Green
+    Write-Host "Local Tauri run/build is blocked by Windows policy. This is not an npm or Rust error." -ForegroundColor Red
+    Write-Host "The MSI/EXE CI previews and the current preview MSIX are not installable on this PC." -ForegroundColor Red
+    Write-Host "The supported route is Microsoft Store: register a developer account, reserve LajuMirror, configure its exact package identity, then submit the MSIX." -ForegroundColor Cyan
+    Write-Host "The Store signs the MSIX only after the package passes certification. It is not signed yet." -ForegroundColor Yellow
+    Write-Host "No Windows security setting will be changed." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Microsoft Store registration: $registrationUrl" -ForegroundColor White
+    Write-Host "Step-by-step repository guide: $guideUrl" -ForegroundColor White
+
+    foreach ($url in @($registrationUrl, $guideUrl)) {
+        try {
+            Start-Process -FilePath $url -ErrorAction Stop
+        }
+        catch {
+            Write-Warning "Could not open $url automatically. Copy the address shown above."
+        }
+    }
 }
 
 function Invoke-Pipeline {
@@ -55,8 +70,7 @@ function Invoke-Pipeline {
     }
 
     if (Test-AppControlEnforced) {
-        Show-SigningGuidance
-        return
+        throw "Smart App Control is enforcing Windows application policy. Local native run/build cannot continue."
     }
 
     foreach ($tool in @("node", "npm")) {
