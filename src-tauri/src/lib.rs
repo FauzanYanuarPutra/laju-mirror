@@ -449,7 +449,10 @@ fn pair_device(app: AppHandle, pairing_address: String, pairing_code: String) ->
 #[tauri::command]
 fn connect_wifi_device(app: AppHandle, address: String) -> CommandResult {
     if let Err(message) = validate_host_port(&address) {
-        return CommandResult { success: false, message };
+        return CommandResult {
+            success: false,
+            message,
+        };
     }
     command_result(run_adb(&app, &["connect", address.trim()]))
 }
@@ -457,7 +460,10 @@ fn connect_wifi_device(app: AppHandle, address: String) -> CommandResult {
 #[tauri::command]
 fn enable_tcpip(app: AppHandle, serial: String, port: u16) -> CommandResult {
     if let Err(message) = validate_serial(&serial).and_then(|_| validate_port(port)) {
-        return CommandResult { success: false, message };
+        return CommandResult {
+            success: false,
+            message,
+        };
     }
 
     let port_text = port.to_string();
@@ -473,7 +479,10 @@ fn enable_tcpip(app: AppHandle, serial: String, port: u16) -> CommandResult {
 #[tauri::command]
 fn restore_usb_mode(app: AppHandle, serial: String) -> CommandResult {
     if let Err(message) = validate_serial(&serial) {
-        return CommandResult { success: false, message };
+        return CommandResult {
+            success: false,
+            message,
+        };
     }
     command_result(run_adb(&app, &["-s", &serial, "usb"]))
 }
@@ -481,7 +490,10 @@ fn restore_usb_mode(app: AppHandle, serial: String) -> CommandResult {
 #[tauri::command]
 fn disconnect_device(app: AppHandle, serial: String) -> CommandResult {
     if let Err(message) = validate_serial(&serial) {
-        return CommandResult { success: false, message };
+        return CommandResult {
+            success: false,
+            message,
+        };
     }
     command_result(run_adb(&app, &["disconnect", &serial]))
 }
@@ -504,7 +516,6 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running LajuMirror");
 }
-
 
 #[cfg(test)]
 mod tests {
