@@ -23,16 +23,11 @@ Changing the app's source code alone cannot make Windows trust arbitrary unsigne
 
 Use GitHub Actions as the Windows build machine. This avoids executing Rust dependency build scripts on the protected laptop.
 
-1. Push the source changes to the `main` branch, or open the [LajuMirror CI workflow](https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml).
-2. To start a build manually, open **Actions → CI → Run workflow**, select `main`, and run it.
-3. Wait for the Windows job to finish successfully.
-4. Open that workflow run and download the `lajumirror-windows-unsigned-preview` artifact only when you need to inspect build output.
-5. Do not install this unsigned preview on a PC enforcing Smart App Control. Check `release-manifest.json` and `SHA256SUMS.txt`; a CI success does not establish publisher trust.
-6. Install only a signed release from the [Releases page](https://github.com/FauzanYanuarPutra/laju-mirror/releases) after the project publishes one.
-
-The CI workflow runs TypeScript checks, builds the frontend, prepares the pinned official scrcpy/ADB package, builds MSI and NSIS installers, checks Rust formatting and the Rust backend, and uploads the installer artifacts. Artifacts are retained for 14 days. The runtime download is pinned to scrcpy v5.0.1 and its reviewed Windows x64 archive SHA-256; bump the version and digest together only after reviewing the upstream release.
-
-This is a remote build route, not a per-app Smart App Control exception. The installer must still satisfy Windows trust checks.
+1. Push source changes to `main`, or open the [LajuMirror CI workflow](https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml).
+2. Run **Actions → CI → Run workflow** on `main`.
+3. The workflow creates an unsigned MSI/EXE preview for build diagnostics and a separate unsigned MSIX package for Microsoft Store submission.
+4. Never install the MSI/EXE preview on a PC enforcing Smart App Control. The MSIX must first use the exact package identity from Partner Center and pass Store certification.
+5. Follow [Microsoft Store distribution](MICROSOFT-STORE.md) to create the developer account, reserve the app name, configure package identity, and submit the MSIX.
 
 ## Code signing
 
@@ -47,7 +42,7 @@ Configure these GitHub Actions repository secrets:
 
 Add them under **GitHub repository → Settings → Secrets and variables → Actions**. Keep the private key out of the repository, source code, logs, and downloadable artifacts. The certificate must come from a provider trusted by Windows and be suitable for code signing.
 
-Without both secrets, the CI preview deliberately completes an unsigned build and reports its signature state in the manifest. Public tagged releases are now blocked unless both secrets are present, the certificate chain is trusted on the Windows runner, and every distributed binary passes Authenticode verification. Signing the outer installer alone is not a guarantee: Windows can evaluate the app executable and bundled tools separately.
+Without both secrets, the MSI/EXE CI preview remains unsigned. A new Microsoft Store MSIX path is available for projects that do not yet have a publisher certificate: Store submissions can be packaged unsigned and Microsoft applies its own package signature after certification. The package still needs a Partner Center identity that exactly matches the reserved Store listing. Public GitHub Releases remain blocked unless the trusted PFX and full Authenticode verification are configured.
 
 For public open-source projects, [SignPath Foundation](https://signpath.org/) offers free signing for projects that meet its eligibility and review conditions. LajuMirror has not been approved by that program. Its conditions include an already released, actively maintained project and signing only eligible project-owned binaries; upstream scrcpy/ADB binaries require separate attention.
 

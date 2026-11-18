@@ -35,16 +35,13 @@ function Test-AppControlEnforced {
 }
 
 function Show-SigningGuidance {
-    $guide = "https://github.com/FauzanYanuarPutra/laju-mirror/blob/main/docs/WINDOWS-APP-CONTROL.md"
-    $releases = "https://github.com/FauzanYanuarPutra/laju-mirror/releases"
     Write-Host ""
     Write-Host "Smart App Control is enforcing Windows application policy on this PC." -ForegroundColor Yellow
-    Write-Host "The current GitHub Actions installer is an unsigned CI preview, not a trusted installer." -ForegroundColor Yellow
-    Write-Host "Do not install or try to force-run unsigned preview files on this PC." -ForegroundColor Red
-    Write-Host "A publicly trusted Authenticode code-signing certificate is required before a release can be installed." -ForegroundColor Cyan
-    Write-Host "No Windows security settings will be changed." -ForegroundColor Green
-    Start-Process $guide
-    Start-Process $releases
+    Write-Host "The MSI/EXE CI preview is unsigned and cannot be installed safely on this PC." -ForegroundColor Red
+    Write-Host "LajuMirror is preparing a Microsoft Store MSIX package. Microsoft signs Store-approved MSIX packages." -ForegroundColor Cyan
+    Write-Host "A Store developer account and the exact package identity from Partner Center are still required." -ForegroundColor Yellow
+    Write-Host "Create the developer account, reserve LajuMirror, then configure the repository variables described in docs/MICROSOFT-STORE.md." -ForegroundColor White
+    Write-Host "Do not disable Smart App Control or install the unsigned preview." -ForegroundColor Green
 }
 
 function Invoke-Pipeline {
@@ -226,7 +223,7 @@ function New-ActionButton {
 $quick = New-ActionButton "SETUP & RUN GUI" 31 450 350 ([System.Drawing.Color]::FromArgb(31, 148, 91))
 $build = New-ActionButton "BUILD LOCAL PREVIEW (UNSIGNED)" 397 450 369 ([System.Drawing.Color]::FromArgb(34, 102, 72))
 $diagnose = New-ActionButton "WINDOWS DIAGNOSTICS" 31 506 350 ([System.Drawing.Color]::FromArgb(47, 67, 54))
-$workflow = New-ActionButton "SIGNING & RELEASE GUIDE" 397 506 369 ([System.Drawing.Color]::FromArgb(47, 67, 54))
+$workflow = New-ActionButton "MICROSOFT STORE SETUP" 397 506 369 ([System.Drawing.Color]::FromArgb(47, 67, 54))
 
 $readme = New-Object System.Windows.Forms.LinkLabel
 $readme.Text = "README and setup guide"
@@ -254,7 +251,7 @@ $build.Enabled = $false
 if (Test-AppControlEnforced) {
     $quick.Text = "LOCAL RUN BLOCKED BY APP CONTROL"
     $build.Text = "LOCAL BUILD BLOCKED BY APP CONTROL"
-    $note.Text = "Smart App Control sedang aktif. CI hanya membuat preview unsigned. Gunakan tombol Signing & Release Guide untuk melihat syarat sertifikat tepercaya. Jangan nonaktifkan perlindungan Windows."
+    $note.Text = "Smart App Control sedang aktif. Preview MSI/EXE belum bisa dipasang. Jalur aman yang disiapkan adalah MSIX melalui Microsoft Store. Gunakan tombol Microsoft Store Setup untuk menyiapkan akun dan identitas paket."
     $quick.Enabled = $false
     $build.Enabled = $false
 }
@@ -282,7 +279,8 @@ $diagnose.Add_Click({
     & $startTask "Diagnose"
 })
 $workflow.Add_Click({
-    Show-SigningGuidance
+    Start-Process "https://storedeveloper.microsoft.com/"
+    Start-Process "https://github.com/FauzanYanuarPutra/laju-mirror/blob/main/docs/MICROSOFT-STORE.md"
 })
 $readme.Add_Click({
     Start-Process "https://github.com/FauzanYanuarPutra/laju-mirror#quick-start"

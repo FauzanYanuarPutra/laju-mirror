@@ -100,6 +100,30 @@ jobs:
           WINDOWS_SIGNING_PFX_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PFX_PASSWORD }}
         run: npm run tauri build -- --bundles msi,nsis
 
+      - name: Set up Microsoft Windows App Developer CLI
+        uses: microsoft/setup-WinAppCli@v0.3.0
+        with:
+          version: v0.3.0
+          github-token: ${{ github.token }}
+
+      - name: Package Microsoft Store MSIX
+        shell: pwsh
+        env:
+          LAJUMIRROR_STORE_IDENTITY_NAME: ${{ vars.LAJUMIRROR_STORE_IDENTITY_NAME }}
+          LAJUMIRROR_STORE_PUBLISHER: ${{ vars.LAJUMIRROR_STORE_PUBLISHER }}
+          LAJUMIRROR_STORE_PUBLISHER_DISPLAY_NAME: ${{ vars.LAJUMIRROR_STORE_PUBLISHER_DISPLAY_NAME }}
+        run: ./scripts/package-windows-store-msix.ps1
+
+      - name: Upload Microsoft Store MSIX package
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: lajumirror-windows-store-msix
+          path: |
+            artifacts/windows-store/*.msix
+            artifacts/windows-store/store-msix-metadata.json
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Sign Windows installers when a trusted certificate is configured
         shell: pwsh
         env:
