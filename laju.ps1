@@ -126,8 +126,8 @@ if ($Mode -ne "Gui") {
     } catch {
         Write-Host ""
         Write-Host ("LajuMirror task failed: " + $_.Exception.Message) -ForegroundColor Red
-        if ($_.Exception.Message -match "(?i)4551|Application Control|blocked") {
-            Write-Host "Opening the Windows code-signing and release guidance." -ForegroundColor Yellow
+        if ($_.Exception.Message -match "(?i)4551|Smart App Control|Application Control|blocked") {
+            Write-Host "Opening the Microsoft Store setup guidance." -ForegroundColor Yellow
             Show-SigningGuidance
         } else {
             Write-Host "Run the read-only diagnostics from the LajuMirror control panel for more detail." -ForegroundColor Yellow
