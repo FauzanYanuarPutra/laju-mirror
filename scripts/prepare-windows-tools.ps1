@@ -4,8 +4,22 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = "https://api.github.com/repos/Genymobile/scrcpy"
-$temp = Join-Path $env:RUNNER_TEMP "lajumirror-scrcpy"
-$destinationPath = Join-Path (Get-Location) $Destination
+$tempRoot = if (-not [string]::IsNullOrWhiteSpace($env:RUNNER_TEMP)) {
+  $env:RUNNER_TEMP
+} elseif (-not [string]::IsNullOrWhiteSpace($env:TEMP)) {
+  $env:TEMP
+} else {
+  [System.IO.Path]::GetTempPath()
+}
+$temp = Join-Path $tempRoot "lajumirror-scrcpy"
+$destinationPath = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $Destination))
+
+if ((Test-Path (Join-Path $destinationPath "scrcpy.exe")) -and
+    (Test-Path (Join-Path $destinationPath "adb.exe"))) {
+  Write-Host "Official scrcpy and ADB tools are already present."
+  Write-Host "Tool directory: $destinationPath"
+  exit 0
+}
 
 Write-Host "Querying the official scrcpy release..."
 $headers = @{

@@ -76,6 +76,13 @@ const copy = {
     chooseDevice: "Pilih perangkat terlebih dahulu.",
     operationFailed: "Operasi gagal",
     sizeUnlimited: "Asli",
+    consentTitle: "Sebelum mulai, pahami izin perangkat",
+    consentIntro: "LajuMirror memakai ADB untuk mendeteksi Android dan scrcpy untuk menampilkan serta mengendalikan layar setelah kamu memulai sesi.",
+    consentUsb: "Izin USB debugging akan muncul langsung di HP. Periksa nama komputer dan setujui hanya jika ini komputer yang kamu percaya.",
+    consentWifi: "Wireless Debugging memerlukan pairing code dari HP. Gunakan hanya pada jaringan pribadi yang kamu percaya.",
+    consentControl: "Saya menyetujui LajuMirror mendeteksi perangkat dan mengendalikan layar hanya saat saya memulai mirroring.",
+    consentAndroid: "Saya memahami persetujuan USB debugging atau pairing harus saya lakukan sendiri di HP, bukan diberikan otomatis oleh Windows.",
+    consentContinue: "Saya paham, lanjutkan",
   },
   en: {
     eyebrow: "ANDROID SCREEN COMPANION",
@@ -129,6 +136,13 @@ const copy = {
     chooseDevice: "Select a device first.",
     operationFailed: "Operation failed",
     sizeUnlimited: "Native",
+    consentTitle: "Before you connect, review device permissions",
+    consentIntro: "LajuMirror uses ADB to detect Android devices and scrcpy to display and control the screen after you start a session.",
+    consentUsb: "The USB debugging prompt appears directly on your phone. Check the computer identity and approve only a computer you trust.",
+    consentWifi: "Wireless Debugging requires a pairing code from your phone. Use it only on a trusted private network.",
+    consentControl: "I allow LajuMirror to detect devices and control the screen only when I start mirroring.",
+    consentAndroid: "I understand USB debugging or pairing approval must be completed by me on the phone, not granted automatically by Windows.",
+    consentContinue: "I understand, continue",
   },
 };
 
@@ -150,6 +164,8 @@ function App() {
   const [port, setPort] = useState("5555");
   const [runningSerial, setRunningSerial] = useState("");
   const [busy, setBusy] = useState(false);
+  const [permissionAccepted, setPermissionAccepted] = useState(false);
+  const [permissionChecks, setPermissionChecks] = useState({ device: false, android: false });
   const [notice, setNotice] = useState<{ text: string; error?: boolean } | null>(null);
 
   const selectedDevice = useMemo(
@@ -164,9 +180,9 @@ function App() {
 
   const refresh = useCallback(async () => {
     try {
-      const [nextDevices, nextTools, nextSessions] = await Promise.all([
-        invoke<Device[]>("get_devices"),
-        invoke<ToolsStatus>("check_tools"),
+      const nextTools = await invoke<ToolsStatus>("check_tools");
+      const [nextDevices, nextSessions] = await Promise.all([
+        nextTools.adbAvailable ? invoke<Device[]>("get_devices") : Promise.resolve([]),
         invoke<string[]>("get_running_sessions"),
       ]);
       setDevices(nextDevices);
@@ -186,10 +202,11 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!permissionAccepted) return;
     void refresh();
     const timer = window.setInterval(() => void refresh(), 4000);
     return () => window.clearInterval(timer);
-  }, [refresh]);
+  }, [refresh, permissionAccepted]);
 
   const runAction = async (action: () => Promise<CommandResult>) => {
     setBusy(true);
@@ -452,6 +469,40 @@ function App() {
       </footer>
 
       {notice && <div className={"toast " + (notice.error ? "toast-error" : "")}><span>{notice.error ? <X size={16} /> : <Check size={16} />}</span>{notice.text}<button onClick={() => setNotice(null)} aria-label="Close notification"><X size={14} /></button></div>}
+      {!permissionAccepted && (
+        <div className="consent-backdrop">
+          <section className="consent-dialog" role="dialog" aria-modal="true" aria-labelledby="consent-title">
+            <span className="consent-icon"><ShieldCheck size={23} /></span>
+            <div className="consent-kicker">LAJUMIRROR · DEVICE ACCESS</div>
+            <h2 id="consent-title">{t.consentTitle}</h2>
+            <p className="consent-intro">{t.consentIntro}</p>
+            <div className="consent-explanation">
+              <div><Cable size={17} /><span>{t.consentUsb}</span></div>
+              <div><Wifi size={17} /><span>{t.consentWifi}</span></div>
+            </div>
+            <label className="consent-choice">
+              <input type="checkbox" checked={permissionChecks.device}
+                onChange={(event) => setPermissionChecks((current) => ({ ...current, device: event.target.checked }))} />
+              <span>{t.consentControl}</span>
+            </label>
+            <label className="consent-choice">
+              <input type="checkbox" checked={permissionChecks.android}
+                onChange={(event) => setPermissionChecks((current) => ({ ...current, android: event.target.checked }))} />
+              <span>{t.consentAndroid}</span>
+            </label>
+            <p className="consent-footnote">
+              {lang === "id"
+                ? "LajuMirror tidak membutuhkan Administrator Windows dan tidak mengubah pengaturan keamanan Windows."
+                : "LajuMirror does not need Windows Administrator access and never changes Windows security settings."}
+            </p>
+            <button className="consent-continue"
+              disabled={!permissionChecks.device || !permissionChecks.android}
+              onClick={() => setPermissionAccepted(true)}>
+              {t.consentContinue}<span>→</span>
+            </button>
+          </section>
+        </div>
+      )}
       <div className="sr-only" aria-live="polite">{runningSerial ? t.running : t.idle}</div>
     </main>
   );

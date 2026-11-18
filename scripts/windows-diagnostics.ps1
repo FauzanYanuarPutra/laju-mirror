@@ -1,7 +1,9 @@
 param(
     [int]$Hours = 24,
     [switch]$Elevated,
-    [string]$OutputPath
+    [string]$OutputPath,
+    [switch]$ConsentGiven,
+    [switch]$NoElevation
 )
 
 $ErrorActionPreference = "Continue"
@@ -61,10 +63,12 @@ Write-Host "Read-only: this tool inspects system details and recent application-
 Write-Host "It does NOT whitelist files, change Windows security, disable protections, or install software."
 Write-Host "Review the saved report before sharing it; event messages can contain local file paths and device or user names."
 Write-Host ""
-$consent = Read-Host "Do you consent to collect this diagnostic report? Type YES to continue"
-if ($consent -cne "YES") {
-    Write-Host "No report was collected." -ForegroundColor Yellow
-    exit 0
+if (-not $ConsentGiven) {
+    $consent = Read-Host "Do you consent to collect this diagnostic report? Type YES to continue"
+    if ($consent -cne "YES") {
+        Write-Host "No report was collected." -ForegroundColor Yellow
+        exit 0
+    }
 }
 
 $isAdmin = Test-IsAdministrator
@@ -212,7 +216,7 @@ catch {
     exit 3
 }
 
-if ($adminRetryNeeded -and -not $isAdmin -and -not $Elevated) {
+if ($adminRetryNeeded -and -not $isAdmin -and -not $Elevated -and -not $NoElevation) {
     Write-Host ""
     $elevate = Read-Host "Windows denied access to some event logs. Re-run this read-only diagnostic as administrator? UAC will appear. Type YES to continue"
     if ($elevate -ceq "YES") {

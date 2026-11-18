@@ -201,19 +201,29 @@ fn version_for(app: &AppHandle, tool: &str) -> Option<String> {
 fn check_tools(app: AppHandle) -> ToolsStatus {
     let adb_version = version_for(&app, "adb");
     let scrcpy_version = version_for(&app, "scrcpy");
-    let resource_dir = app.path().resource_dir().ok();
-    let bundled = resource_dir
-        .map(|path| {
-            path.join("tools")
-                .join("scrcpy")
-                .join(if cfg!(windows) {
-                    "scrcpy.exe"
-                } else {
-                    "scrcpy"
-                })
-                .is_file()
-        })
-        .unwrap_or(false);
+    let tool_filename = |tool: &str| {
+        if cfg!(windows) {
+            format!("{tool}.exe")
+        } else {
+            tool.to_string()
+        }
+    };
+    let resource_tools = app
+        .path()
+        .resource_dir()
+        .ok()
+        .map(|path| path.join("tools").join("scrcpy"));
+    let development_tools = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("resources")
+        .join("tools")
+        .join("scrcpy");
+    let bundled = ["adb", "scrcpy"].iter().all(|tool| {
+        let filename = tool_filename(tool);
+        resource_tools
+            .as_ref()
+            .is_some_and(|directory| directory.join(&filename).is_file())
+            || development_tools.join(&filename).is_file()
+    });
 
     ToolsStatus {
         adb_available: adb_version.is_some(),
@@ -226,12 +236,14 @@ fn check_tools(app: AppHandle) -> ToolsStatus {
 
 #[tauri::command]
 fn get_devices(app: AppHandle) -> Result<Vec<DeviceInfo>, String> {
-    let output = match run_adb(&app, &["devices", "-l"]) {
-        Ok(output) => output,
-        Err(_) => return Ok(Vec::new()),
-    };
+    let output = run_adb(&app, &["devices", "-l"])?;
     if !output.status.success() {
-        return Ok(Vec::new());
+        let details = output_text(&output);
+        return Err(if details.is_empty() {
+            format!("ADB could not list devices ({}).", output.status)
+        } else {
+            format!("ADB could not list devices: {details}")
+        });
     }
 
     let response = String::from_utf8_lossy(&output.stdout);

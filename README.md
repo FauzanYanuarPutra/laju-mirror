@@ -34,6 +34,16 @@ LajuMirror currently targets **Windows 10/11, 64-bit**. An Android phone with US
 
 ## Quick start
 
+For a guided Windows setup, clone the repository and launch the control panel with one command:
+
+~~~powershell
+git clone https://github.com/FauzanYanuarPutra/laju-mirror.git
+cd laju-mirror
+powershell -NoProfile -ExecutionPolicy Bypass -File .\laju.ps1
+~~~
+
+The LajuMirror control panel checks prerequisites, requests consent before downloading the official ADB/scrcpy tools, and offers one-click local development or Windows installer builds. If Windows Application Control blocks local Cargo build scripts, it opens the remote Windows CI workflow instead. It never disables Windows security or silently requests Administrator access. Android USB debugging and Wireless Debugging approval still have to be granted directly on the phone.
+
 1. Install LajuMirror from a verified GitHub Release.
 2. On your Android phone, open **Settings → About phone** and tap **Build number / OS version** repeatedly until Developer options are enabled. The exact label varies by phone.
 3. Open **Settings → Additional settings / System → Developer options** and enable **USB debugging**.
