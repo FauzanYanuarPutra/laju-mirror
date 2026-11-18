@@ -33,7 +33,7 @@ Write-Host "Cargo:" (cargo --version)
 Write-Host ""
 
 # Smart App Control state is read-only here. This launcher never changes policy.
-$policyPath = "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\CI\\Policy"
+$policyPath = "HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy"
 $smartAppControlState = $null
 try {
     $policy = Get-ItemProperty -Path $policyPath -Name "VerifiedAndReputablePolicyState" -ErrorAction Stop
