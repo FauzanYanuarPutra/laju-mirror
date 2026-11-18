@@ -116,7 +116,7 @@ foreach ($entry in $manifest.files) {
 foreach ($expectedPath in $requiredFiles) {
     $relativePath = [IO.Path]::GetRelativePath($repoRoot, $expectedPath).Replace([string][char]92, "/")
     if (-not $manifestByPath.ContainsKey($relativePath)) {
-        $invalid.Add("$relativePath: required distributable is missing from the manifest")
+        $invalid.Add("${relativePath}: required distributable is missing from the manifest")
     }
 }
 
