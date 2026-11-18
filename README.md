@@ -42,7 +42,7 @@ cd laju-mirror
 powershell -NoProfile -ExecutionPolicy Bypass -File .\laju.ps1
 ~~~
 
-The LajuMirror control panel checks prerequisites, requests consent before downloading the official ADB/scrcpy tools, and offers one-click local development or Windows installer builds. If Windows Application Control blocks local Cargo build scripts, it opens the remote Windows CI workflow instead. It never disables Windows security or silently requests Administrator access. Android USB debugging and Wireless Debugging approval still have to be granted directly on the phone.
+The LajuMirror control panel checks prerequisites, requests consent before downloading the official ADB/scrcpy tools, and offers one-click local development or unsigned local preview builds. If Smart App Control is enforcing policy, local run/build actions are blocked in the panel and it opens the code-signing guidance instead. CI artifacts are unsigned previews only and must not be installed on a PC enforcing Smart App Control. The launcher never disables Windows security or silently requests Administrator access. Android USB debugging and Wireless Debugging approval still have to be granted directly on the phone.
 
 1. Install LajuMirror from a verified GitHub Release.
 2. On your Android phone, open **Settings → About phone** and tap **Build number / OS version** repeatedly until Developer options are enabled. The exact label varies by phone.

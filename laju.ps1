@@ -34,15 +34,17 @@ function Test-AppControlEnforced {
     }
 }
 
-function Start-RemoteBuild {
-    $url = "https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml"
+function Show-SigningGuidance {
+    $guide = "https://github.com/FauzanYanuarPutra/laju-mirror/blob/main/docs/WINDOWS-APP-CONTROL.md"
+    $releases = "https://github.com/FauzanYanuarPutra/laju-mirror/releases"
     Write-Host ""
-    Write-Host "Windows Application Control is enforcing a policy on this machine." -ForegroundColor Yellow
-    Write-Host "Local Cargo build scripts may be blocked with error 4551." -ForegroundColor Yellow
+    Write-Host "Smart App Control is enforcing Windows application policy on this PC." -ForegroundColor Yellow
+    Write-Host "The current GitHub Actions installer is an unsigned CI preview, not a trusted installer." -ForegroundColor Yellow
+    Write-Host "Do not install or try to force-run unsigned preview files on this PC." -ForegroundColor Red
+    Write-Host "A publicly trusted Authenticode code-signing certificate is required before a release can be installed." -ForegroundColor Cyan
     Write-Host "No Windows security settings will be changed." -ForegroundColor Green
-    Write-Host "The official Windows build runs on a GitHub-hosted runner."
-    Write-Host "On the Actions page, select Run workflow and choose the main branch."
-    Start-Process $url
+    Start-Process $guide
+    Start-Process $releases
 }
 
 function Invoke-Pipeline {
@@ -51,7 +53,12 @@ function Invoke-Pipeline {
     if ($Mode -eq "Diagnose") {
         Write-Stage "Read-only Windows diagnostics"
         & (Join-Path $RepoRoot "scripts/windows-diagnostics.ps1") -ConsentGiven -NoElevation
-        if ($LASTEXITCODE -ne 0) { throw "Windows diagnostics failed." }
+        if (-not $?) { throw "Windows diagnostics failed." }
+        return
+    }
+
+    if (Test-AppControlEnforced) {
+        Show-SigningGuidance
         return
     }
 
@@ -69,11 +76,6 @@ function Invoke-Pipeline {
     Write-Stage "Validate frontend"
     Invoke-Npm @("run", "check")
     Invoke-Npm @("run", "build")
-
-    if (Test-AppControlEnforced) {
-        Start-RemoteBuild
-        return
-    }
 
     foreach ($tool in @("rustc", "cargo")) {
         if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
@@ -114,8 +116,8 @@ if ($Mode -ne "Gui") {
         Write-Host ""
         Write-Host ("LajuMirror task failed: " + $_.Exception.Message) -ForegroundColor Red
         if ($_.Exception.Message -match "(?i)4551|Application Control|blocked") {
-            Write-Host "Opening the official remote Windows build workflow." -ForegroundColor Yellow
-            Start-RemoteBuild
+            Write-Host "Opening the Windows code-signing and release guidance." -ForegroundColor Yellow
+            Show-SigningGuidance
         } else {
             Write-Host "Run the read-only diagnostics from the LajuMirror control panel for more detail." -ForegroundColor Yellow
         }
@@ -222,9 +224,9 @@ function New-ActionButton {
 }
 
 $quick = New-ActionButton "SETUP & RUN GUI" 31 450 350 ([System.Drawing.Color]::FromArgb(31, 148, 91))
-$build = New-ActionButton "BUILD WINDOWS INSTALLER" 397 450 369 ([System.Drawing.Color]::FromArgb(34, 102, 72))
+$build = New-ActionButton "BUILD LOCAL PREVIEW (UNSIGNED)" 397 450 369 ([System.Drawing.Color]::FromArgb(34, 102, 72))
 $diagnose = New-ActionButton "WINDOWS DIAGNOSTICS" 31 506 350 ([System.Drawing.Color]::FromArgb(47, 67, 54))
-$workflow = New-ActionButton "OPEN REMOTE WINDOWS BUILD" 397 506 369 ([System.Drawing.Color]::FromArgb(47, 67, 54))
+$workflow = New-ActionButton "SIGNING & RELEASE GUIDE" 397 506 369 ([System.Drawing.Color]::FromArgb(47, 67, 54))
 
 $readme = New-Object System.Windows.Forms.LinkLabel
 $readme.Text = "README and setup guide"
@@ -243,26 +245,34 @@ $form.Controls.Add($footer)
 
 $startTask = {
     param($TaskMode)
-    $commandLine = '-NoProfile -ExecutionPolicy Bypass -File "{0}" -Mode {1}' -f $PSCommandPath, $TaskMode
+    $commandLine = '-NoProfile -NoExit -ExecutionPolicy Bypass -File "{0}" -Mode {1}' -f $PSCommandPath, $TaskMode
     Start-Process -FilePath "powershell.exe" -ArgumentList $commandLine -WorkingDirectory $RepoRoot
 }
 
 $quick.Enabled = $false
 $build.Enabled = $false
+if (Test-AppControlEnforced) {
+    $quick.Text = "LOCAL RUN BLOCKED BY APP CONTROL"
+    $build.Text = "LOCAL BUILD BLOCKED BY APP CONTROL"
+    $note.Text = "Smart App Control sedang aktif. CI hanya membuat preview unsigned. Gunakan tombol Signing & Release Guide untuk melihat syarat sertifikat tepercaya. Jangan nonaktifkan perlindungan Windows."
+    $quick.Enabled = $false
+    $build.Enabled = $false
+}
 $consentChanged = {
     $allowed = $consent1.Checked -and $consent2.Checked
-    $quick.Enabled = $allowed
-    $build.Enabled = $allowed
+    $appControlEnforced = Test-AppControlEnforced
+    $quick.Enabled = $allowed -and -not $appControlEnforced
+    $build.Enabled = $allowed -and -not $appControlEnforced
 }
 $consent1.Add_CheckedChanged($consentChanged)
 $consent2.Add_CheckedChanged($consentChanged)
 $quick.Add_Click({
     & $startTask "QuickStart"
-    [System.Windows.Forms.MessageBox]::Show("Setup berjalan di jendela PowerShell baru. Ikuti hasil pemeriksaan di sana.", "LajuMirror", "OK", "Information") | Out-Null
+    [System.Windows.Forms.MessageBox]::Show("Setup berjalan di jendela PowerShell yang tetap terbuka agar semua pesan dan error bisa dibaca.", "LajuMirror", "OK", "Information") | Out-Null
 })
 $build.Add_Click({
     & $startTask "Build"
-    [System.Windows.Forms.MessageBox]::Show("Proses build berjalan di jendela PowerShell baru. Installer akan dibuat setelah pemeriksaan berhasil.", "LajuMirror", "OK", "Information") | Out-Null
+    [System.Windows.Forms.MessageBox]::Show("Preview lokal akan dibuat di jendela PowerShell yang tetap terbuka. Build ini tidak ditandatangani dan bukan installer untuk PC dengan Smart App Control.", "LajuMirror", "OK", "Warning") | Out-Null
 })
 $diagnose.Add_Click({
     if (-not $diagnosticConsent.Checked) {
@@ -272,7 +282,7 @@ $diagnose.Add_Click({
     & $startTask "Diagnose"
 })
 $workflow.Add_Click({
-    Start-Process "https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml"
+    Show-SigningGuidance
 })
 $readme.Add_Click({
     Start-Process "https://github.com/FauzanYanuarPutra/laju-mirror#quick-start"

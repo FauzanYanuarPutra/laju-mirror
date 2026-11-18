@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 
 Write-Host ""
 Write-Host "LajuMirror Windows development launcher" -ForegroundColor Cyan
-Write-Host "This will run the local Vite and Rust development processes."
+Write-Host "This will run the local Vite and Rust development processes when Windows policy permits them."
 Write-Host "It will not change App Control, Smart App Control, AppLocker, or antivirus settings."
 Write-Host ""
 
@@ -47,14 +47,11 @@ if ($smartAppControlState -eq 1) {
     Write-Host "The diagnostic report confirmed that Windows blocks unsigned Cargo dependency build scripts." -ForegroundColor Yellow
     Write-Host "A code change, UAC prompt, or administrator PowerShell window cannot grant an individual Smart App Control exception." -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "Frontend-only development (no Rust backend): npm run dev" -ForegroundColor Cyan
-    Write-Host "Full Windows build on GitHub Actions:" -ForegroundColor Cyan
-    Write-Host "https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml"
-    Write-Host ""
-    $choice = Read-Host "Open the remote Windows build page in your browser now? Type YES"
-    if ($choice -ceq "YES") {
-        Start-Process "https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml"
-    }
+    Write-Host "GitHub Actions produces an unsigned preview only. Do not install or force-run that preview on this PC." -ForegroundColor Yellow
+    Write-Host "A trusted Authenticode signing certificate is required before LajuMirror can be installed under this policy." -ForegroundColor Cyan
+    Write-Host "No Windows security settings were changed." -ForegroundColor Green
+    Start-Process "https://github.com/FauzanYanuarPutra/laju-mirror/blob/main/docs/WINDOWS-APP-CONTROL.md"
+    Start-Process "https://github.com/FauzanYanuarPutra/laju-mirror/releases"
     Write-Host "No Windows security settings were changed." -ForegroundColor Green
     exit 3
 }
