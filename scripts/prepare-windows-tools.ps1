@@ -18,7 +18,7 @@ if ((Test-Path (Join-Path $destinationPath "scrcpy.exe")) -and
     (Test-Path (Join-Path $destinationPath "adb.exe"))) {
   Write-Host "Official scrcpy and ADB tools are already present."
   Write-Host "Tool directory: $destinationPath"
-  exit 0
+  return
 }
 
 Write-Host "Querying the official scrcpy release..."

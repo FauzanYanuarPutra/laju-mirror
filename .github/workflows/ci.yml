@@ -35,6 +35,21 @@ jobs:
       - name: Install frontend dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Validate PowerShell scripts
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Path . -Recurse -Filter *.ps1 -File |
+            Where-Object { $_.FullName -notmatch '\\(node_modules|target)\\' }
+          foreach ($file in $files) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count -gt 0) {
+              $errors | Format-List
+              throw "PowerShell syntax validation failed: $($file.FullName)"
+            }
+          }
+
       - name: TypeScript check
         run: npm run check
 

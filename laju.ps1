@@ -48,6 +48,13 @@ function Start-RemoteBuild {
 function Invoke-Pipeline {
     Write-Stage "LajuMirror smart setup"
 
+    if ($Mode -eq "Diagnose") {
+        Write-Stage "Read-only Windows diagnostics"
+        & (Join-Path $RepoRoot "scripts/windows-diagnostics.ps1") -ConsentGiven -NoElevation
+        if ($LASTEXITCODE -ne 0) { throw "Windows diagnostics failed." }
+        return
+    }
+
     foreach ($tool in @("node", "npm")) {
         if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
             throw "$tool is missing. Install Node.js LTS from https://nodejs.org/ and reopen this launcher."
@@ -55,13 +62,6 @@ function Invoke-Pipeline {
     }
     Write-Host ("Node.js: " + (& node --version)) -ForegroundColor Green
     Write-Host ("npm: " + (& npm.cmd --version)) -ForegroundColor Green
-
-    if ($Mode -eq "Diagnose") {
-        Write-Stage "Read-only Windows diagnostics"
-        & (Join-Path $RepoRoot "scripts/windows-diagnostics.ps1") -ConsentGiven -NoElevation
-        if ($LASTEXITCODE -ne 0) { throw "Windows diagnostics failed." }
-        return
-    }
 
     Write-Stage "Install project dependencies"
     Invoke-Npm @("install", "--no-audit", "--no-fund", "--no-package-lock")
