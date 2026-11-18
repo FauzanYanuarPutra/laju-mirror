@@ -57,6 +57,15 @@ jobs:
       - name: Generate application icons
         run: npm run tauri icon src-tauri/icons/icon.svg
 
+      - name: Check Rust formatting
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
+
+      - name: Check Rust backend
+        run: cargo check --manifest-path src-tauri/Cargo.toml
+
+      - name: Run Rust backend unit tests
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
       - name: Build Windows installers and sign the app binary when configured
         env:
           WINDOWS_SIGNING_PFX_BASE64: ${{ secrets.WINDOWS_SIGNING_PFX_BASE64 }}
@@ -77,11 +86,6 @@ jobs:
           WINDOWS_SIGNING_PFX_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PFX_PASSWORD }}
         run: ./scripts/write-windows-manifest.ps1
 
-      - name: Check Rust formatting
-        run: cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
-
-      - name: Check Rust backend
-        run: cargo check --manifest-path src-tauri/Cargo.toml
 
       - name: Upload Windows installer artifacts and provenance
         uses: actions/upload-artifact@v4
