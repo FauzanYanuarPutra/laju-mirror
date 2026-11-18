@@ -9,7 +9,10 @@ $certificateBase64 = $env:WINDOWS_SIGNING_PFX_BASE64
 $certificatePassword = $env:WINDOWS_SIGNING_PFX_PASSWORD
 
 if ([string]::IsNullOrWhiteSpace($certificateBase64) -or [string]::IsNullOrWhiteSpace($certificatePassword)) {
-    Write-Host "Trusted code-signing credentials are not configured; leaving '$Path' unsigned." -ForegroundColor Yellow
+    if ($env:WINDOWS_SIGNING_REQUIRED -eq "true") {
+        throw "Trusted code-signing credentials are required. Refusing to produce an unsigned release binary: $Path"
+    }
+    Write-Host "Trusted code-signing credentials are not configured; leaving '$Path' unsigned for CI preview only." -ForegroundColor Yellow
     return
 }
 

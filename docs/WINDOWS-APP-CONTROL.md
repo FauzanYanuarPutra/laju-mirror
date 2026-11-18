@@ -26,8 +26,9 @@ Use GitHub Actions as the Windows build machine. This avoids executing Rust depe
 1. Push the source changes to the `main` branch, or open the [LajuMirror CI workflow](https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml).
 2. To start a build manually, open **Actions → CI → Run workflow**, select `main`, and run it.
 3. Wait for the Windows job to finish successfully.
-4. Open that workflow run and download the `lajumirror-windows-installers` artifact.
-5. Check `release-manifest.json` and `SHA256SUMS.txt` before installing.
+4. Open that workflow run and download the `lajumirror-windows-unsigned-preview` artifact only when you need to inspect build output.
+5. Do not install this unsigned preview on a PC enforcing Smart App Control. Check `release-manifest.json` and `SHA256SUMS.txt`; a CI success does not establish publisher trust.
+6. Install only a signed release from the [Releases page](https://github.com/FauzanYanuarPutra/laju-mirror/releases) after the project publishes one.
 
 The CI workflow runs TypeScript checks, builds the frontend, prepares the Windows package, builds MSI and NSIS installers, checks Rust formatting and the Rust backend, and uploads the installer artifacts. Artifacts are retained for 14 days.
 
@@ -37,7 +38,7 @@ This is a remote build route, not a per-app Smart App Control exception. The ins
 
 Smart App Control allows binaries it recognizes as safe or binaries signed with a code-signing certificate issued by a certificate authority in Microsoft's Trusted Root Program. The publisher certificate must be trusted by Windows. Self-signed development certificates do not provide public trust.
 
-The Tauri bundle is configured to call `src-tauri/sign-windows-file.ps1` for its application executable. The release workflows also sign the MSI and NSIS installers when a trusted certificate is configured. Unsigned bundled scrcpy/ADB EXE and DLL files are also signed by the LajuMirror distributor identity when the same trusted certificate is configured. Existing upstream signatures are preserved; an existing invalid signature is never overwritten. The binary manifest records each file's resulting signer and status.
+The Tauri bundle is configured to call `src-tauri/sign-windows-file.ps1` for its application executable. The release workflow also signs the MSI and NSIS installers. Unsigned bundled scrcpy/ADB EXE and DLL files are signed by the LajuMirror distributor identity using the same trusted certificate. The release workflow fails closed when trusted signing is not configured. Existing upstream signatures are preserved; an existing invalid signature is never overwritten. The binary manifest records each file's resulting signer and status.
 
 Configure these GitHub Actions repository secrets:
 
@@ -46,7 +47,7 @@ Configure these GitHub Actions repository secrets:
 
 Add them under **GitHub repository → Settings → Secrets and variables → Actions**. Keep the private key out of the repository, source code, logs, and downloadable artifacts. The certificate must come from a provider trusted by Windows and be suitable for code signing.
 
-Without both secrets, CI deliberately completes an unsigned build and reports its signature state in the manifest. A successful build does not mean an unsigned installer will pass Smart App Control. Signing the outer installer alone is also not a guarantee: Windows can evaluate the app executable and other binaries separately.
+Without both secrets, the CI preview deliberately completes an unsigned build and reports its signature state in the manifest. Public tagged releases are now blocked unless both secrets are present, the certificate chain is trusted on the Windows runner, and every distributed binary passes Authenticode verification. Signing the outer installer alone is not a guarantee: Windows can evaluate the app executable and bundled tools separately.
 
 For public open-source projects, [SignPath Foundation](https://signpath.org/) offers free signing for projects that meet its eligibility and review conditions. LajuMirror has not been approved by that program. Its conditions include an already released, actively maintained project and signing only eligible project-owned binaries; upstream scrcpy/ADB binaries require separate attention.
 

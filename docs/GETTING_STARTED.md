@@ -11,10 +11,12 @@ Panduan ini untuk pengguna Windows yang ingin menampilkan dan mengontrol HP Andr
 
 ## 2. Instal aplikasi
 
-1. Unduh file installer MSI atau EXE dari halaman Releases.
-2. Jalankan installer dan ikuti petunjuk di layar.
-3. Buka LajuMirror dari Start menu.
-4. Jika Windows menampilkan peringatan SmartScreen untuk rilis awal yang belum ditandatangani, periksa kembali bahwa file berasal dari repositori resmi ini. Jangan menjalankan file dari mirror atau sumber yang tidak dikenal.
+1. Unduh file installer MSI atau EXE dari halaman Releases setelah tersedia.
+2. Pastikan penerbit/signature Windows valid sebelum menjalankannya.
+3. Jangan memasang artifact CI unsigned preview pada perangkat yang menerapkan Smart App Control.
+4. Jalankan installer tepercaya dan ikuti petunjuk di layar.
+5. Buka LajuMirror dari Start menu.
+6. Jika Windows memblokir file, jangan mematikan Smart App Control atau Defender. Gunakan hanya rilis bertanda tangan tepercaya atau minta administrator perangkat meninjau kebijakan yang berlaku.
 
 ## 3. Siapkan Android
 

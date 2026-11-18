@@ -24,11 +24,11 @@ LajuMirror is a lightweight Windows desktop companion for mirroring and controll
 
 ## Download and remote Windows build
 
-Official installers will be published on the [Releases page](https://github.com/FauzanYanuarPutra/laju-mirror/releases). For a build from the current source, open [GitHub Actions → CI](https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml), select a successful run, and download its `lajumirror-windows-installers` artifact.
+Official installers will be published on the [Releases page](https://github.com/FauzanYanuarPutra/laju-mirror/releases) only after a trusted Windows code-signing certificate is configured and every distributed binary passes Authenticode verification. CI test builds are uploaded separately as `lajumirror-windows-unsigned-preview`; they are for build validation only and are not a safe substitute for a signed installer on PCs enforcing Smart App Control. Do not try to bypass a Windows block by weakening system security.
 
-The CI workflow also supports manual runs: open **Actions → CI → Run workflow**, choose the `main` branch, and start the Windows build. This is useful when local Rust build scripts are blocked by Smart App Control because compilation takes place on a GitHub-hosted Windows runner, not on the developer's laptop.
+The CI workflow also supports manual runs: open **Actions → CI → Run workflow**, choose the `main` branch, and start the Windows build. This validates the source and creates an unsigned preview artifact on GitHub-hosted Windows. A successful CI run proves the app compiles; it does not make the unsigned artifact trusted by Windows.
 
-**Important:** remote compilation does not create a Smart App Control exception. An unsigned installer or unsigned binary can still be blocked when downloaded or launched. The build manifest reports hashes and Authenticode signature status. A trusted code-signing certificate must be configured in GitHub Actions for signed builds.
+**Important:** remote compilation does not create a Smart App Control exception. An unsigned installer or unsigned binary can still be blocked when downloaded or launched. The build manifest reports hashes and Authenticode signature status. A trusted code-signing certificate must be configured in GitHub Actions for signed builds. The tagged release workflow now fails closed unless the PFX contains a valid, trusted Code Signing certificate with its private key, and it verifies the SHA-256 manifest and Authenticode signature of every distributable executable, DLL and installer before publication.
 
 LajuMirror currently targets **Windows 10/11, 64-bit**. An Android phone with USB debugging or Wireless Debugging enabled is required.
 

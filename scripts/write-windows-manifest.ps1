@@ -46,6 +46,8 @@ $manifest = [ordered]@{
     sourceRef = $env:GITHUB_REF
     generatedAtUtc = [DateTime]::UtcNow.ToString("o")
     signingConfigured = -not ([string]::IsNullOrWhiteSpace($env:WINDOWS_SIGNING_PFX_BASE64) -or [string]::IsNullOrWhiteSpace($env:WINDOWS_SIGNING_PFX_PASSWORD))
+    signingRequired = ($env:WINDOWS_SIGNING_REQUIRED -eq "true")
+    buildPurpose = $(if ($env:GITHUB_REF -like "refs/tags/v*") { "release" } else { "ci-preview" })
     files = @($entries)
 }
 
