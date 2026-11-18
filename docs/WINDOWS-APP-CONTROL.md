@@ -37,7 +37,7 @@ This is a remote build route, not a per-app Smart App Control exception. The ins
 
 Smart App Control allows binaries it recognizes as safe or binaries signed with a code-signing certificate issued by a certificate authority in Microsoft's Trusted Root Program. The publisher certificate must be trusted by Windows. Self-signed development certificates do not provide public trust.
 
-The Tauri bundle is configured to call `src-tauri/sign-windows-file.ps1` for its application executable. The release workflows also sign the MSI and NSIS installers when a trusted certificate is configured.
+The Tauri bundle is configured to call `src-tauri/sign-windows-file.ps1` for its application executable. The release workflows also sign the MSI and NSIS installers when a trusted certificate is configured. Unsigned bundled scrcpy/ADB EXE and DLL files are also signed by the LajuMirror distributor identity when the same trusted certificate is configured. Existing upstream signatures are preserved; an existing invalid signature is never overwritten. The binary manifest records each file's resulting signer and status.
 
 Configure these GitHub Actions repository secrets:
 
