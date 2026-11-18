@@ -216,7 +216,8 @@ try {
     $outputName = "LajuMirror_$($packageVersion)_x64.msix"
     Push-Location $outputPath
     try {
-        & $winapp.Source pack $layoutPath --manifest $manifestPath --no-sign --executable "lajumirror.exe" --output $outputName
+        $env:WINAPP_CLI_TELEMETRY_OPTOUT = "1"
+        & $winapp.Source package $layoutPath --manifest $manifestPath --executable "lajumirror.exe" --output $outputName
         if ($LASTEXITCODE -ne 0) {
             throw "WinApp CLI could not create the MSIX package. Exit code: $LASTEXITCODE"
         }

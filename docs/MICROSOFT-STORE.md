@@ -15,7 +15,7 @@ The Windows CI workflow now:
 1. Builds the Tauri application and official pinned scrcpy/ADB runtime.
 2. Stages the application executable and all runtime files into an MSIX layout.
 3. Generates Store tile assets from the LajuMirror application icon.
-4. Builds an unsigned MSIX package using Microsoft's WinApp CLI.
+4. Builds an unsigned MSIX package using Microsoft's WinApp CLI 0.3.0 `package` command. No development certificate is supplied, so the artifact remains unsigned for Store submission.
 5. Opens the package and verifies that the executable, ADB, scrcpy, DLL resources, manifest, and Store assets are present.
 6. Writes \`store-msix-metadata.json\` with the package identity, SHA-256 digest, and whether a real Partner Center identity was supplied.
 
