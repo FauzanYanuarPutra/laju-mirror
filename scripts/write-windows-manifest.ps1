@@ -26,7 +26,7 @@ foreach ($directory in @("src-tauri/target/release/bundle/msi", "src-tauri/targe
 
 $entries = foreach ($file in ($files | Sort-Object FullName -Unique)) {
     $signature = Get-AuthenticodeSignature -FilePath $file.FullName
-    $relativePath = [IO.Path]::GetRelativePath((Get-Location).Path, $file.FullName).Replace("\\", "/")
+    $relativePath = [IO.Path]::GetRelativePath((Get-Location).Path, $file.FullName).Replace([string][char]92, "/")
     $hash = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
 
     [ordered]@{
