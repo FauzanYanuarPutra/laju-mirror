@@ -43,6 +43,8 @@ jobs:
 
       - name: Prepare official scrcpy and ADB binaries
         shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: ./scripts/prepare-windows-tools.ps1
 
       - name: Sign unsigned bundled scrcpy and ADB binaries when trusted signing is configured
