@@ -49,6 +49,9 @@ jobs:
 
       - name: Create signature and SHA-256 manifest
         shell: pwsh
+        env:
+          WINDOWS_SIGNING_PFX_BASE64: ${{ secrets.WINDOWS_SIGNING_PFX_BASE64 }}
+          WINDOWS_SIGNING_PFX_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PFX_PASSWORD }}
         run: ./scripts/write-windows-manifest.ps1
 
       - name: Publish release assets
