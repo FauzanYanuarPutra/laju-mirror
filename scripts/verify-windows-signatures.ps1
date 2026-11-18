@@ -68,7 +68,7 @@ $manifestPaths = @($manifest.files | ForEach-Object { $_.path })
 foreach ($expected in $requiredFiles) {
     $relative = [IO.Path]::GetRelativePath((Get-Location).Path, $expected).Replace([string][char]92, "/")
     if ($manifestPaths -notcontains $relative) {
-        $invalid += "$relative: required distributable is missing from the manifest"
+        $invalid += "${relative}: required distributable is missing from the manifest"
     }
 }
 
