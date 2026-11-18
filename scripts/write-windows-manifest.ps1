@@ -34,8 +34,8 @@ $entries = foreach ($file in ($files | Sort-Object FullName -Unique)) {
         sizeBytes = $file.Length
         sha256 = $hash
         signatureStatus = [string]$signature.Status
-        signer = if ($signature.SignerCertificate) { $signature.SignerCertificate.Subject } else { $null }
-        thumbprint = if ($signature.SignerCertificate) { $signature.SignerCertificate.Thumbprint } else { $null }
+        signer = $(if ($signature.SignerCertificate) { $signature.SignerCertificate.Subject } else { $null })
+        thumbprint = $(if ($signature.SignerCertificate) { $signature.SignerCertificate.Thumbprint } else { $null })
     }
 }
 
