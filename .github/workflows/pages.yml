@@ -26,14 +26,31 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v7.0.1
+
+      - name: Check whether GitHub Pages is enabled
+        id: pages-status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if gh api "repos/${GITHUB_REPOSITORY}/pages" >/dev/null 2>&1; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::GitHub Pages is not enabled for this repository. Enable it in Settings > Pages and choose GitHub Actions as the build and deployment source."
+          fi
+
       - name: Configure GitHub Pages
+        if: steps.pages-status.outputs.enabled == 'true'
         uses: actions/configure-pages@v6.0.0
-        with:
-          enablement: true
+
       - name: Upload website artifact
+        if: steps.pages-status.outputs.enabled == 'true'
         uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: website
+
       - name: Deploy website
+        if: steps.pages-status.outputs.enabled == 'true'
         id: deployment
         uses: actions/deploy-pages@v5.0.1
