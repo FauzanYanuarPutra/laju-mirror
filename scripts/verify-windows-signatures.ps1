@@ -1,22 +1,39 @@
 $ErrorActionPreference = "Stop"
 
 $manifestPath = "artifacts/windows-release/release-manifest.json"
+$configPath = "src-tauri/tauri.conf.json"
 if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
     throw "Release manifest is missing: $manifestPath"
 }
+if (-not (Test-Path -LiteralPath $configPath -PathType Leaf)) {
+    throw "Tauri configuration is missing: $configPath"
+}
 
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+$config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
 if (-not $manifest.signingConfigured -or -not $manifest.signingRequired) {
     throw "Refusing to publish: the manifest does not confirm required trusted code signing."
 }
+if ($manifest.buildPurpose -ne "release") {
+    throw "Refusing to publish a build not marked as a tagged release."
+}
 
-$expectedFiles = @(
-    "src-tauri/target/release/lajumirror.exe",
-    "src-tauri/target/release/bundle/msi/LajuMirror_0.1.0_x64_en-US.msi",
-    "src-tauri/target/release/bundle/nsis/LajuMirror_0.1.0_x64-setup.exe"
+$msiPattern = "$($config.productName)_$($config.version)_x64_*.msi"
+$nsisPattern = "$($config.productName)_$($config.version)_x64-setup.exe"
+$requiredFiles = @(
+    "src-tauri/target/release/lajumirror.exe"
 )
-
-foreach ($expected in $expectedFiles) {
+$msiFiles = @(Get-ChildItem -Path "src-tauri/target/release/bundle/msi" -Filter $msiPattern -File -ErrorAction SilentlyContinue)
+$nsisFiles = @(Get-ChildItem -Path "src-tauri/target/release/bundle/nsis" -Filter $nsisPattern -File -ErrorAction SilentlyContinue)
+if ($msiFiles.Count -eq 0) {
+    throw "No MSI installer matching '$msiPattern' was found."
+}
+if ($nsisFiles.Count -eq 0) {
+    throw "No NSIS installer matching '$nsisPattern' was found."
+}
+$requiredFiles += @($msiFiles | ForEach-Object { $_.FullName })
+$requiredFiles += @($nsisFiles | ForEach-Object { $_.FullName })
+foreach ($expected in $requiredFiles) {
     if (-not (Test-Path -LiteralPath $expected -PathType Leaf)) {
         throw "A required release binary is missing: $expected"
     }
@@ -44,6 +61,14 @@ foreach ($entry in $manifest.files) {
 
     if ($entry.signatureStatus -ne "Valid") {
         $invalid += "$($entry.path): manifest signature status is $($entry.signatureStatus)"
+    }
+}
+
+$manifestPaths = @($manifest.files | ForEach-Object { $_.path })
+foreach ($expected in $requiredFiles) {
+    $relative = [IO.Path]::GetRelativePath((Get-Location).Path, $expected).Replace([string][char]92, "/")
+    if ($manifestPaths -notcontains $relative) {
+        $invalid += "$relative: required distributable is missing from the manifest"
     }
 }
 

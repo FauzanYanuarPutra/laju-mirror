@@ -100,6 +100,7 @@ jobs:
         env:
           WINDOWS_SIGNING_PFX_BASE64: ${{ secrets.WINDOWS_SIGNING_PFX_BASE64 }}
           WINDOWS_SIGNING_PFX_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PFX_PASSWORD }}
+          WINDOWS_SIGNING_REQUIRED: "true"
         run: ./scripts/write-windows-manifest.ps1
 
       - name: Verify every distributable binary is Authenticode-valid
