@@ -45,6 +45,13 @@ jobs:
         shell: pwsh
         run: ./scripts/prepare-windows-tools.ps1
 
+      - name: Sign unsigned bundled scrcpy and ADB binaries when trusted signing is configured
+        shell: pwsh
+        env:
+          WINDOWS_SIGNING_PFX_BASE64: ${{ secrets.WINDOWS_SIGNING_PFX_BASE64 }}
+          WINDOWS_SIGNING_PFX_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PFX_PASSWORD }}
+        run: ./scripts/sign-windows-runtime-tools.ps1
+
       - name: Generate application icons
         run: npm run tauri icon src-tauri/icons/icon.svg
 
