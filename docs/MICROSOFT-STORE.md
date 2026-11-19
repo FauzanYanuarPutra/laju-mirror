@@ -57,7 +57,7 @@ Do not put passwords, certificates, private keys, or personal identity documents
 7. Complete Store listing fields, privacy information, screenshots, age rating, and certification checks. Use the public [LajuMirror privacy policy](https://github.com/FauzanYanuarPutra/laju-mirror/blob/main/docs/PRIVACY.md) in the listing's privacy policy URL field.
 8. Publish after Microsoft approves the submission.
 
-The package must not be installed directly before Store signing. An unsigned MSIX package is a submission input, not an installer for the protected laptop. Once Microsoft signs and publishes the app, install LajuMirror from its Microsoft Store listing.
+The package must not be installed directly before Store signing. An unsigned MSIX package is a submission input, not an installer for the protected laptop. Once Microsoft signs and publishes the app, install LajuMirror from its Microsoft Store listing. The GitHub CI job verifies package contents and tests that the bundled ADB and scrcpy binaries start, but it cannot submit the app, complete Store certification, or install the Store-signed app on your PC.
 
 ## Limits and expectations
 

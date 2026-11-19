@@ -6,6 +6,19 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      store_identity_name:
+        description: "Optional exact Package/Identity Name copied from Partner Center"
+        required: false
+        type: string
+      store_publisher:
+        description: "Optional exact Publisher distinguished name copied from Partner Center"
+        required: false
+        type: string
+      store_publisher_display_name:
+        description: "Optional exact Publisher Display Name copied from Partner Center"
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -110,10 +123,14 @@ jobs:
         id: package-store-msix
         shell: pwsh
         env:
-          LAJUMIRROR_STORE_IDENTITY_NAME: ${{ vars.LAJUMIRROR_STORE_IDENTITY_NAME }}
-          LAJUMIRROR_STORE_PUBLISHER: ${{ vars.LAJUMIRROR_STORE_PUBLISHER }}
-          LAJUMIRROR_STORE_PUBLISHER_DISPLAY_NAME: ${{ vars.LAJUMIRROR_STORE_PUBLISHER_DISPLAY_NAME }}
+          LAJUMIRROR_STORE_IDENTITY_NAME: ${{ vars.LAJUMIRROR_STORE_IDENTITY_NAME || inputs.store_identity_name }}
+          LAJUMIRROR_STORE_PUBLISHER: ${{ vars.LAJUMIRROR_STORE_PUBLISHER || inputs.store_publisher }}
+          LAJUMIRROR_STORE_PUBLISHER_DISPLAY_NAME: ${{ vars.LAJUMIRROR_STORE_PUBLISHER_DISPLAY_NAME || inputs.store_publisher_display_name }}
         run: ./scripts/package-windows-store-msix.ps1
+
+      - name: Verify MSIX integrity and smoke-test bundled Android tools
+        shell: pwsh
+        run: ./scripts/verify-windows-store-package.ps1
 
       - name: Upload Microsoft Store submission MSIX
         if: steps.package-store-msix.outputs.store_submission_ready == 'true'

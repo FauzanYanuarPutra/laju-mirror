@@ -30,6 +30,8 @@ The CI workflow also supports manual runs: open **Actions → CI → Run workflo
 
 For direct GitHub Releases distribution outside the Store, a trusted Authenticode certificate is still required. The release workflow fails closed unless the configured certificate is valid and every distributed executable, DLL and installer passes signature and SHA-256 verification. Do not install unsigned MSI/EXE previews or weaken Windows security.
 
+The CI workflow's **Run workflow** form accepts the three exact package identity values from Partner Center. It also verifies the MSIX contents against source hashes and runs ADB/scrcpy startup checks from the packaged runtime folder. This is a packaging/runtime smoke test, not Microsoft Store certification or a physical Android device test.
+
 LajuMirror currently targets **Windows 10/11, 64-bit**. An Android phone with USB debugging or Wireless Debugging enabled is required.
 
 ## Quick start

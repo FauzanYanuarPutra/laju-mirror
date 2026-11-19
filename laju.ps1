@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet("Gui", "QuickStart", "Build", "Diagnose")]
+    [ValidateSet("Gui", "QuickStart", "Build", "Diagnose", "Store")]
     [string]$Mode = "Gui"
 )
 
@@ -37,19 +37,29 @@ function Test-AppControlEnforced {
 function Show-SigningGuidance {
     $registrationUrl = "https://storedeveloper.microsoft.com/"
     $guideUrl = "https://github.com/FauzanYanuarPutra/laju-mirror/blob/main/docs/MICROSOFT-STORE.md"
+    $workflowUrl = "https://github.com/FauzanYanuarPutra/laju-mirror/actions/workflows/ci.yml"
 
     Write-Host ""
-    Write-Host "Smart App Control is enforcing Windows application policy on this PC." -ForegroundColor Yellow
-    Write-Host "Local Tauri run/build is blocked by Windows policy. This is not an npm or Rust error." -ForegroundColor Red
-    Write-Host "The MSI/EXE CI previews and the current preview MSIX are not installable on this PC." -ForegroundColor Red
-    Write-Host "The supported route is Microsoft Store: register a developer account, reserve LajuMirror, configure its exact package identity, then submit the MSIX." -ForegroundColor Cyan
-    Write-Host "The Store signs the MSIX only after the package passes certification. It is not signed yet." -ForegroundColor Yellow
-    Write-Host "No Windows security setting will be changed." -ForegroundColor Green
+    Write-Host "LAJUMIRROR BELUM DAPAT DIJALANKAN DI PC INI" -ForegroundColor Yellow
+    Write-Host "Smart App Control sedang aktif. Windows menolak binary yang belum dipercaya." -ForegroundColor Red
+    Write-Host "MSI/EXE preview dan MSIX preview dari CI belum boleh dipasang." -ForegroundColor Red
     Write-Host ""
-    Write-Host "Microsoft Store registration: $registrationUrl" -ForegroundColor White
-    Write-Host "Step-by-step repository guide: $guideUrl" -ForegroundColor White
+    Write-Host "Jalur resmi tanpa membeli sertifikat code-signing:" -ForegroundColor Cyan
+    Write-Host "1. Buat akun Microsoft Store Developer melalui alur baru. Pendaftaran akun baru saat ini tanpa biaya; verifikasi identitas tetap diperlukan." -ForegroundColor White
+    Write-Host "2. Di Partner Center, buat aplikasi dan reservasi nama LajuMirror." -ForegroundColor White
+    Write-Host "3. Salin Package/Identity Name, Publisher, dan Publisher Display Name persis dari halaman Product identity." -ForegroundColor White
+    Write-Host "4. Buka GitHub Actions > CI > Run workflow, lalu isi tiga kolom identitas Store tersebut." -ForegroundColor White
+    Write-Host "5. Pastikan artifact bernama lajumirror-windows-store-msix-submission dan metadata storeSubmissionReady bernilai true." -ForegroundColor White
+    Write-Host "6. Submit MSIX di Partner Center, selesaikan sertifikasi, lalu install dari Microsoft Store setelah dipublikasikan." -ForegroundColor White
+    Write-Host ""
+    Write-Host "Microsoft menandatangani MSIX setelah aplikasi lolos sertifikasi. Proses review Store belum otomatis dan belum selesai." -ForegroundColor Yellow
+    Write-Host "Tidak ada pengaturan keamanan Windows yang akan diubah." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Pendaftaran Store: $registrationUrl" -ForegroundColor White
+    Write-Host "Panduan identitas dan submission: $guideUrl" -ForegroundColor White
+    Write-Host "CI untuk membuat paket submission: $workflowUrl" -ForegroundColor White
 
-    foreach ($url in @($registrationUrl, $guideUrl)) {
+    foreach ($url in @($registrationUrl, $guideUrl, $workflowUrl)) {
         try {
             Start-Process -FilePath $url -ErrorAction Stop
         }
@@ -61,6 +71,11 @@ function Show-SigningGuidance {
 
 function Invoke-Pipeline {
     Write-Stage "LajuMirror smart setup"
+
+    if ($Mode -eq "Store") {
+        Show-SigningGuidance
+        return
+    }
 
     if ($Mode -eq "Diagnose") {
         Write-Stage "Read-only Windows diagnostics"
@@ -265,7 +280,7 @@ $build.Enabled = $false
 if (Test-AppControlEnforced) {
     $quick.Text = "LOCAL RUN BLOCKED BY APP CONTROL"
     $build.Text = "LOCAL BUILD BLOCKED BY APP CONTROL"
-    $note.Text = "Smart App Control sedang aktif. Preview MSI/EXE belum bisa dipasang. Jalur aman yang disiapkan adalah MSIX melalui Microsoft Store. Gunakan tombol Microsoft Store Setup untuk menyiapkan akun dan identitas paket."
+    $note.Text = "Smart App Control sedang aktif. Preview belum bisa dipasang. Jalur aman: akun Store, reservasi LajuMirror, isi identitas Partner Center saat Run workflow, submit MSIX, tunggu sertifikasi, lalu install dari Microsoft Store."
     $quick.Enabled = $false
     $build.Enabled = $false
 }
@@ -293,8 +308,7 @@ $diagnose.Add_Click({
     & $startTask "Diagnose"
 })
 $workflow.Add_Click({
-    Start-Process "https://storedeveloper.microsoft.com/"
-    Start-Process "https://github.com/FauzanYanuarPutra/laju-mirror/blob/main/docs/MICROSOFT-STORE.md"
+    Show-SigningGuidance
 })
 $readme.Add_Click({
     Start-Process "https://github.com/FauzanYanuarPutra/laju-mirror#quick-start"
