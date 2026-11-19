@@ -60,6 +60,22 @@ fn hidden_command(program: &Path) -> Command {
     command
 }
 
+fn find_bundled_tool(resource_dir: &Path, filename: &str) -> Option<PathBuf> {
+    // Standard Tauri bundles place resources beside the executable. The
+    // Microsoft Store MSIX layout keeps them under the package's resources
+    // directory, so support both layouts explicitly.
+    let candidates = [
+        resource_dir.join("tools").join("scrcpy").join(filename),
+        resource_dir
+            .join("resources")
+            .join("tools")
+            .join("scrcpy")
+            .join(filename),
+    ];
+
+    candidates.into_iter().find(|candidate| candidate.is_file())
+}
+
 fn resolve_tool(app: &AppHandle, tool: &str) -> PathBuf {
     let filename = if cfg!(windows) {
         format!("{tool}.exe")
@@ -80,8 +96,7 @@ fn resolve_tool(app: &AppHandle, tool: &str) -> PathBuf {
     }
 
     if let Ok(resource_dir) = app.path().resource_dir() {
-        let bundled = resource_dir.join("tools").join("scrcpy").join(&filename);
-        if bundled.is_file() {
+        if let Some(bundled) = find_bundled_tool(&resource_dir, &filename) {
             return bundled;
         }
     }
@@ -208,20 +223,17 @@ fn check_tools(app: AppHandle) -> ToolsStatus {
             tool.to_string()
         }
     };
-    let resource_tools = app
-        .path()
-        .resource_dir()
-        .ok()
-        .map(|path| path.join("tools").join("scrcpy"));
+    let resource_dir = app.path().resource_dir().ok();
     let development_tools = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("resources")
         .join("tools")
         .join("scrcpy");
     let bundled = ["adb", "scrcpy"].iter().all(|tool| {
         let filename = tool_filename(tool);
-        resource_tools
+        resource_dir
             .as_ref()
-            .is_some_and(|directory| directory.join(&filename).is_file())
+            .and_then(|directory| find_bundled_tool(directory, &filename))
+            .is_some()
             || development_tools.join(&filename).is_file()
     });
 
@@ -531,7 +543,49 @@ pub fn run() {
 
 #[cfg(test)]
 mod tests {
-    use super::{validate_host_port, validate_port, validate_serial};
+    use super::{find_bundled_tool, validate_host_port, validate_port, validate_serial};
+    use std::{
+        fs,
+        path::PathBuf,
+        time::{SystemTime, UNIX_EPOCH},
+    };
+
+    #[test]
+    fn bundled_tool_resolver_supports_tauri_and_msix_resource_layouts() {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("system clock should be after the Unix epoch")
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!(
+            "lajumirror-resource-layout-test-{}-{unique}",
+            std::process::id()
+        ));
+
+        let standard_root = root.join("standard");
+        let standard_tools = standard_root.join("tools").join("scrcpy");
+        fs::create_dir_all(&standard_tools).expect("create standard Tauri resource directory");
+        let standard_adb = standard_tools.join("adb.exe");
+        fs::write(&standard_adb, b"test").expect("create standard ADB fixture");
+        assert_eq!(
+            find_bundled_tool(&standard_root, "adb.exe"),
+            Some(standard_adb)
+        );
+
+        let msix_root = root.join("msix");
+        let msix_tools = msix_root.join("resources").join("tools").join("scrcpy");
+        fs::create_dir_all(&msix_tools).expect("create Store MSIX resource directory");
+        let msix_scrcpy = msix_tools.join("scrcpy.exe");
+        fs::write(&msix_scrcpy, b"test").expect("create MSIX scrcpy fixture");
+        assert_eq!(
+            find_bundled_tool(&msix_root, "scrcpy.exe"),
+            Some(msix_scrcpy)
+        );
+
+        let missing = find_bundled_tool(&msix_root, "missing.exe");
+        assert_eq!(missing, None);
+
+        let _ = fs::remove_dir_all(root);
+    }
 
     #[test]
     fn serial_validation_accepts_usb_and_wifi_serials() {
