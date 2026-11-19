@@ -169,8 +169,7 @@ try {
             throw "The source runtime directory must include ADB and scrcpy."
         }
         foreach ($file in $toolFiles) {
-            $relative = [IO.Path]::GetRelativePath((Resolve-Path $toolDirectory).Path, $file.FullName)
-                .Replace([string][char]92, "/")
+            $relative = [IO.Path]::GetRelativePath((Resolve-Path $toolDirectory).Path, $file.FullName).Replace([string][char]92, "/")
             [void]$expectedFiles.Add([pscustomobject]@{
                 PackagePath = "resources/tools/scrcpy/$relative"
                 SourcePath = $file.FullName
